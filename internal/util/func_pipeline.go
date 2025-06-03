@@ -1,21 +1,60 @@
 package util
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"reflect"
 	"time"
 
 	"go.uber.org/zap"
 )
 
-func executeFunctionPipeline(functions []func(interface{}) (interface{}, error), maxRetries int, delay time.Duration, inner interface{}, logger *zap.Logger) (interface{}, error) {
+func callFunction(fn interface{}, args ...interface{}) (interface{}, error) {
+	fnValue := reflect.ValueOf(fn)
+	fnType := fnValue.Type()
+
+	// Проверяем, что это функция
+	if fnType.Kind() != reflect.Func {
+		return nil, fmt.Errorf("не является функцией")
+	}
+
+	// Проверяем количество возвращаемых значений
+	if fnType.NumOut() != 2 {
+		return nil, fmt.Errorf("функция должна возвращать 2 значения (any, error)")
+	}
+
+	// Проверяем, что второй возвращаемый тип - error
+	if !fnType.Out(1).Implements(reflect.TypeOf((*error)(nil)).Elem()) {
+		return nil, fmt.Errorf("второй возвращаемый параметр должен быть error")
+	}
+
+	// Подготавливаем аргументы
+	in := make([]reflect.Value, len(args))
+	for i, arg := range args {
+		in[i] = reflect.ValueOf(arg)
+	}
+
+	// Вызываем функцию
+	results := fnValue.Call(in)
+
+	// Возвращаем результаты
+	var err error
+	if !results[1].IsNil() {
+		err = results[1].Interface().(error)
+	}
+
+	return results[0].Interface(), err
+}
+
+func ExecuteFunctionPipeline(ctx context.Context, functions []any, maxRetries int, delay time.Duration, inner interface{}, logger *zap.Logger) (interface{}, error) {
 	var result interface{} = inner
 	for i, fn := range functions {
 		retries := 0
 		for retries <= maxRetries {
 			logger.Info(fmt.Sprintf("Running function %d/%d\n", i+1, len(functions)))
 
-			res, err := fn(result) // Вызов функции с результатом предыдущей функции
+			res, err := callFunction(fn, ctx, result, logger) // Вызов функции с результатом предыдущей функции
 
 			if err == nil {
 				result = res
