@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -11,19 +10,20 @@ import (
 )
 
 // ConnectMongo принимает uri и logger
-func ConnectMongo(uri string, logger *zap.Logger) (*mongo.Client, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+func ConnectMongo(ctx context.Context, uri string, logger *zap.Logger) (*mongo.Client, error) {
+	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// defer cancel()
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	// defer client.Disconnect(ctx)
 	if err != nil {
-		logger.Error("Failed to connect to MongoDB", zap.Error(err))
+		logger.Error("Failed to connect to MongoDB ", zap.Error(err))
 		return nil, err
 	}
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		logger.Error("Failed to ping MongoDB", zap.Error(err))
+		logger.Error("Failed to ping MongoDB ", zap.Error(err))
 		return nil, err
 	}
 
