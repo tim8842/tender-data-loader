@@ -2,20 +2,19 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/tim8842/tender-data-loader/internal/model"
 	"github.com/tim8842/tender-data-loader/internal/repository"
 	"go.uber.org/zap"
 )
 
 // AgreementHandler обрабатывает запросы к договорам
 type AgreementHandler struct {
-	repo   *repository.MongoRepository[model.Agreement]
+	repo   repository.IMongoRepository
 	logger *zap.Logger
 }
 
 // NewAgreementHandler создает новый handler
 func NewAgreementHandler(
-	repo *repository.MongoRepository[model.Agreement],
+	repo repository.IMongoRepository,
 	logger *zap.Logger,
 ) *AgreementHandler {
 	return &AgreementHandler{

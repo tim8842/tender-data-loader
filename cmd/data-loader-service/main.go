@@ -14,7 +14,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/tim8842/tender-data-loader/internal/handler"
-	"github.com/tim8842/tender-data-loader/internal/model"
 	"github.com/tim8842/tender-data-loader/internal/repository"
 	t "github.com/tim8842/tender-data-loader/internal/tasks"
 	"github.com/tim8842/tender-data-loader/internal/util"
@@ -27,18 +26,18 @@ import (
 // @host localhost:8080
 // @BasePath /
 
-func startTasks(logger *zap.Logger) {
+func startTasksWithVarRepo(logger *zap.Logger, variableRepo repository.IMongoRepository) {
 	WorkerCount := 1
 	tasks := make(chan string, 1)
 	var wg sync.WaitGroup
 	wg.Add(WorkerCount)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	handlers := map[string]t.TaskHandler{
-		"back_to_now_agreement": t.TaskFunc(t.BackToNowAgreementTask),
+	handlers := map[string]t.TaskHandlerWithRepo{
+		"back_to_now_agreement": t.TaskFuncWithRepo(t.BackToNowAgreementTask),
 	}
 	for i := 0; i < WorkerCount; i++ {
-		go t.Worker(ctx, i+1, tasks, handlers, &wg, logger)
+		go t.WorkerWithRepo(ctx, i+1, tasks, handlers, &wg, logger, variableRepo)
 	}
 	tasks <- "back_to_now_agreement"
 	logger.Info("Send back_to_now_agreement in logger")
@@ -84,14 +83,14 @@ func main() {
 		Title:    "Swagger API Docs",
 	}))
 	// ctx, cancel := context.WithCancel(context.Background())
-	agreementRepo := repository.NewRepository[model.Agreement](db.Collection("agreements"), logger)
-	variableRepo := repository.NewRepository[model.Variable](db.Collection("variables"), logger)
+	agreementRepo := repository.NewRepository(db.Collection("agreements"), logger)
+	variableRepo := repository.NewRepository(db.Collection("variables"), logger)
 	dbp.CreateBase(ctx, variableRepo, logger)
 	defer cancel()
 	agreementHandler := handler.NewAgreementHandler(agreementRepo, logger)
 	app.Get("/agreements/:id", agreementHandler.GetAgreementByID)
 	go func() {
-		startTasks(logger)
+		startTasksWithVarRepo(logger, variableRepo)
 	}()
 	logger.Info("Сервер запущен на :8080")
 	if err := app.Listen(":8080"); err != nil {

@@ -38,8 +38,8 @@ func InitLogger(logDir string) (*zap.Logger, error) {
 	consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig) // Используем ConsoleEncoder для более читаемого вывода
 
 	// Создаём cores (ядра логирования) для файла и консоли
-	fileCore := zapcore.NewCore(jsonEncoder, fileWriteSyncer, zap.InfoLevel)          // Логи в файл
-	consoleCore := zapcore.NewCore(consoleEncoder, consoleWriteSyncer, zap.InfoLevel) // Логи в консоль
+	fileCore := zapcore.NewCore(jsonEncoder, fileWriteSyncer, zap.DebugLevel)          // Логи в файл
+	consoleCore := zapcore.NewCore(consoleEncoder, consoleWriteSyncer, zap.DebugLevel) // Логи в консоль
 
 	// Объединяем cores в один Tee (разветвитель)
 	core := zapcore.NewTee(fileCore, consoleCore)
