@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -12,63 +11,135 @@ import (
 	"github.com/tim8842/tender-data-loader/internal/model"
 	"github.com/tim8842/tender-data-loader/internal/repository"
 	"github.com/tim8842/tender-data-loader/internal/service"
-	"github.com/tim8842/tender-data-loader/internal/util"
+	subtasks "github.com/tim8842/tender-data-loader/internal/tasks/sub_tasks"
+	"github.com/tim8842/tender-data-loader/internal/util/wrappers"
 	"go.uber.org/zap"
 )
 
-func BackToNowAgreementTask(ctx context.Context, logger *zap.Logger, variableRepo repository.IMongoRepository) error {
-	for {
+type BackToNowAgreementTask struct {
+	repo repository.IMongoRepository
+}
 
+func NewBackToNowAgreementTask(repo repository.IMongoRepository) *BackToNowAgreementTask {
+	return &BackToNowAgreementTask{repo: repo}
+}
+
+func (t *BackToNowAgreementTask) Process(ctx context.Context, logger *zap.Logger) error {
+	for {
 		select {
 		case <-ctx.Done():
 			logger.Info("BackToNowAgreementTask: Context cancelled, exiting.")
 			return ctx.Err()
 		default:
-			var tmp interface{}
-			tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, res string, logger *zap.Logger) (interface{}, error) {
-				data, ok := variableRepo.GetByID(ctx, res)
-				var model model.VariableBackToNowAgreement
-				b, ok := json.Marshal(data)
-				ok = json.Unmarshal(b, &model)
-				fmt.Println(model)
-				if ok == nil {
-					return model, ok
-				} else {
-					return nil, ok
-				}
-			}, 3, 5*time.Second, "back_to_now_agreement", logger)
-			varData, _ := tmp.(model.VariableBackToNowAgreement)
-			// Полчаем прокси
-			tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, url string, logger *zap.Logger) (interface{}, error) {
-				data, ok := service.GetUserAgent(ctx, url, logger)
-				return data, ok
-			}, 3, 5*time.Second, os.Getenv("URL_GET_PROXY"), logger)
-			userAgent, _ := tmp.(service.UserAgentResponse)
-			dbDate := util.FormatDate(varData.Vars.Signed_at)
-			resForGetNumbers := service.PageInner{UserAgent: userAgent, Url: os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST") +
-				dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND") + dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD") + fmt.Sprintf("%d", varData.Vars.Page) + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH"),
+			var tmp any
+			var err error
+			tmp, err = wrappers.FuncWrapper(ctx, logger, 3, 5*time.Second, subtasks.NewGetVariableBackToNowAgreementById(t.repo, "back_to_now_agreement"))
+			if err != nil {
+				continue
 			}
+			varData, _ := tmp.(*model.VariableBackToNowAgreement)
+			fmt.Println(varData)
 
-			// Получаем страницу с номерами
-			tmp, _ = util.FuncWrapper(ctx, service.GetPage, 3, 5*time.Second, resForGetNumbers, logger)
-			// парсим ее
-			tmp, _ = util.FuncWrapper(ctx, service.ParseAgreementIds, 3, 5*time.Second, tmp.([]byte), logger)
-			numbers := tmp.([]string)
-			// url := res
-			// получаем новый прокси для новых запросов
-			tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, url string, logger *zap.Logger) (interface{}, error) {
-				data, ok := service.GetUserAgent(ctx, url, logger)
-				return data, ok
-			}, 3, 5*time.Second, os.Getenv("URL_GET_PROXY"), logger)
-			userAgent, _ = tmp.(service.UserAgentResponse)
+			// var tmp interface{}
+			// tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, res string, logger *zap.Logger) (interface{}, error) {
+			// 	data, ok := variableRepo.GetByID(ctx, res)
+			// 	var model model.VariableBackToNowAgreement
+			// 	b, ok := json.Marshal(data)
+			// 	ok = json.Unmarshal(b, &model)
+			// 	fmt.Println(model)
+			// 	if ok == nil {
+			// 		return model, ok
+			// 	} else {
+			// 		return nil, ok
+			// 	}
+			// }, 3, 5*time.Second, "back_to_now_agreement", logger)
+			// varData, _ := tmp.(model.VariableBackToNowAgreement)
+			// // Полчаем прокси
+			// tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, url string, logger *zap.Logger) (interface{}, error) {
+			// 	data, ok := service.GetUserAgent(ctx, url, logger)
+			// 	return data, ok
+			// }, 3, 5*time.Second, os.Getenv("URL_GET_PROXY"), logger)
+			// userAgent, _ := tmp.(service.UserAgentResponse)
+			// dbDate := util.FormatDate(varData.Vars.Signed_at)
 			// resForGetNumbers := service.PageInner{UserAgent: userAgent, Url: os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST") +
-			// 	dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND") + dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD") + string(varData.Vars.Page) + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH"),
+			// 	dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND") + dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD") + fmt.Sprintf("%d", varData.Vars.Page) + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH"),
 			// }
-			tmp, _ = util.FuncWrapper(ctx, ManyRequests, 3, 5*time.Second, map[string]any{"numbers": numbers, "userAgent": userAgent}, logger)
+
+			// // Получаем страницу с номерами
+			// tmp, _ = util.FuncWrapper(ctx, service.GetPage, 3, 5*time.Second, resForGetNumbers, logger)
+			// // парсим ее
+			// tmp, _ = util.FuncWrapper(ctx, service.ParseAgreementIds, 3, 5*time.Second, tmp.([]byte), logger)
+			// numbers := tmp.([]string)
+			// // url := res
+			// // получаем новый прокси для новых запросов
+			// tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, url string, logger *zap.Logger) (interface{}, error) {
+			// 	data, ok := service.GetUserAgent(ctx, url, logger)
+			// 	return data, ok
+			// }, 3, 5*time.Second, os.Getenv("URL_GET_PROXY"), logger)
+			// userAgent, _ = tmp.(service.UserAgentResponse)
+			// // resForGetNumbers := service.PageInner{UserAgent: userAgent, Url: os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST") +
+			// // 	dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND") + dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD") + string(varData.Vars.Page) + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH"),
+			// // }
+			// tmp, _ = util.FuncWrapper(ctx, ManyRequests, 3, 5*time.Second, map[string]any{"numbers": numbers, "userAgent": userAgent}, logger)
 			time.Sleep(5 * time.Second)
 		}
 	}
+	return nil
 }
+
+// func BackToNowAgreementTask(ctx context.Context, logger *zap.Logger, variableRepo repository.IMongoRepository) error {
+// 	for {
+
+// 		select {
+// 		case <-ctx.Done():
+// 			logger.Info("BackToNowAgreementTask: Context cancelled, exiting.")
+// 			return ctx.Err()
+// 		default:
+// 			var tmp interface{}
+// 			tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, res string, logger *zap.Logger) (interface{}, error) {
+// 				data, ok := variableRepo.GetByID(ctx, res)
+// 				var model model.VariableBackToNowAgreement
+// 				b, ok := json.Marshal(data)
+// 				ok = json.Unmarshal(b, &model)
+// 				fmt.Println(model)
+// 				if ok == nil {
+// 					return model, ok
+// 				} else {
+// 					return nil, ok
+// 				}
+// 			}, 3, 5*time.Second, "back_to_now_agreement", logger)
+// 			varData, _ := tmp.(model.VariableBackToNowAgreement)
+// 			// Полчаем прокси
+// 			tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, url string, logger *zap.Logger) (interface{}, error) {
+// 				data, ok := service.GetUserAgent(ctx, url, logger)
+// 				return data, ok
+// 			}, 3, 5*time.Second, os.Getenv("URL_GET_PROXY"), logger)
+// 			userAgent, _ := tmp.(service.UserAgentResponse)
+// 			dbDate := util.FormatDate(varData.Vars.Signed_at)
+// 			resForGetNumbers := service.PageInner{UserAgent: userAgent, Url: os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST") +
+// 				dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND") + dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD") + fmt.Sprintf("%d", varData.Vars.Page) + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH"),
+// 			}
+
+// 			// Получаем страницу с номерами
+// 			tmp, _ = util.FuncWrapper(ctx, service.GetPage, 3, 5*time.Second, resForGetNumbers, logger)
+// 			// парсим ее
+// 			tmp, _ = util.FuncWrapper(ctx, service.ParseAgreementIds, 3, 5*time.Second, tmp.([]byte), logger)
+// 			numbers := tmp.([]string)
+// 			// url := res
+// 			// получаем новый прокси для новых запросов
+// 			tmp, _ = util.FuncWrapper(ctx, func(ctx context.Context, url string, logger *zap.Logger) (interface{}, error) {
+// 				data, ok := service.GetUserAgent(ctx, url, logger)
+// 				return data, ok
+// 			}, 3, 5*time.Second, os.Getenv("URL_GET_PROXY"), logger)
+// 			userAgent, _ = tmp.(service.UserAgentResponse)
+// 			// resForGetNumbers := service.PageInner{UserAgent: userAgent, Url: os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST") +
+// 			// 	dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND") + dbDate + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD") + string(varData.Vars.Page) + os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH"),
+// 			// }
+// 			tmp, _ = util.FuncWrapper(ctx, ManyRequests, 3, 5*time.Second, map[string]any{"numbers": numbers, "userAgent": userAgent}, logger)
+// 			time.Sleep(5 * time.Second)
+// 		}
+// 	}
+// }
 
 func ManyRequests(ctx context.Context, data any, logger *zap.Logger) (any, error) {
 	var mainOk error

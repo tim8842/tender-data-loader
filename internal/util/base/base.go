@@ -1,4 +1,4 @@
-package util
+package base
 
 import (
 	"encoding/json"
@@ -31,7 +31,7 @@ func UnmarshalVars[T any](vars map[string]interface{}) (T, error) {
 	return result, err
 }
 
-func truncateRunes(s string, maxLen int) string {
+func TruncateRunes(s string, maxLen int) string {
 	runes := []rune(s)
 	if len(runes) > maxLen {
 		return string(runes[:maxLen])

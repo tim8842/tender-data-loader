@@ -3,21 +3,16 @@ package main
 import (
 	"context"
 	"log"
-	"os"
-	"sync"
 	"time"
 
-	"github.com/gofiber/contrib/swagger"
-	"github.com/gofiber/fiber/v2"
-
 	"github.com/joho/godotenv"
-	"go.uber.org/zap"
-
-	"github.com/tim8842/tender-data-loader/internal/handler"
+	"github.com/tim8842/tender-data-loader/internal/config"
+	loggerPackage "github.com/tim8842/tender-data-loader/internal/logger"
 	"github.com/tim8842/tender-data-loader/internal/repository"
-	t "github.com/tim8842/tender-data-loader/internal/tasks"
-	"github.com/tim8842/tender-data-loader/internal/util"
+	"github.com/tim8842/tender-data-loader/internal/setup"
+	"github.com/tim8842/tender-data-loader/internal/tasks"
 	dbp "github.com/tim8842/tender-data-loader/pkg/db"
+	"go.uber.org/zap"
 )
 
 // @title Tender API
@@ -26,72 +21,45 @@ import (
 // @host localhost:8080
 // @BasePath /
 
-func startTasksWithVarRepo(logger *zap.Logger, variableRepo repository.IMongoRepository) {
-	WorkerCount := 1
-	tasks := make(chan string, 1)
-	var wg sync.WaitGroup
-	wg.Add(WorkerCount)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	handlers := map[string]t.TaskHandlerWithRepo{
-		"back_to_now_agreement": t.TaskFuncWithRepo(t.BackToNowAgreementTask),
-	}
-	for i := 0; i < WorkerCount; i++ {
-		go t.WorkerWithRepo(ctx, i+1, tasks, handlers, &wg, logger, variableRepo)
-	}
-	tasks <- "back_to_now_agreement"
-	logger.Info("Send back_to_now_agreement in logger")
-	close(tasks)
-	wg.Wait()
-	logger.Info("Main: all workers finished")
-}
-
 func main() {
+	mainCtx, cancel := context.WithCancel(context.Background())
+	//закрываю родителя, должны закрыться и дети
+	ctxTimeout, cancelTimeout := context.WithTimeout(mainCtx, 10*time.Second)
+	defer cancel()
+	defer cancelTimeout()
+	// Загрузка логера
 	_ = godotenv.Load()
-	logger, err := util.InitLogger("./logs")
+	logger, err := loggerPackage.InitLogger("./logs")
 	if err != nil {
 		log.Fatalf("Ошибка инициализации логгера: %v", err)
 	}
 	defer logger.Sync()
 	logger.Info("Логгер инициализирован")
+	// Загрузка конфига
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
+	}
+	client, dbConn, err := setup.SetupMongo(
+		ctxTimeout,
+		logger,
+		setup.MongoConfig{
+			User: cfg.MongoUser, Password: cfg.MongoPassword,
+			Host: cfg.MongoHost, Port: cfg.MongoPort,
+			DBName: cfg.MongoDB,
+		},
+	)
+	if err != nil {
+		logger.Fatal("Ошибка подключеник к монго", zap.Error(err))
+	}
+	defer client.Disconnect(mainCtx)
 
-	// Подключение к MongoDB
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	// client, err := mongo.Connect(ctx, options.Client().ApplyURI(
-	// 	"mongodb://"+os.Getenv("MONGO_USER")+
-	// 		":"+os.Getenv("MONGO_PASSWORD")+"@"+
-	// 		os.Getenv("MONGO_HOST")+
-	// 		":"+os.Getenv("MONGO_PORT")+"/?authSource=admin",
-	// ))
-	// if err != nil {
-	// 	logger.Fatal("Не удалось создать Mongo client", zap.Error(err))
-	// }
-	defer cancel()
-	// defer client.Disconnect(ctx)
-	client, _ := dbp.ConnectMongo(ctx, "mongodb://"+os.Getenv("MONGO_USER")+
-		":"+os.Getenv("MONGO_PASSWORD")+"@"+
-		os.Getenv("MONGO_HOST")+
-		":"+os.Getenv("MONGO_PORT")+"/?authSource=admin", logger)
-	defer client.Disconnect(ctx)
-	db := client.Database("tenderdb")
-	// logger.Info("Подключено к MongoDB")
-	app := fiber.New()
-	app.Use(swagger.New(swagger.Config{
-		BasePath: "/",
-		FilePath: "./docs/swagger.yaml",
-		Path:     "swagger",
-		Title:    "Swagger API Docs",
-	}))
-	// ctx, cancel := context.WithCancel(context.Background())
-	agreementRepo := repository.NewRepository(db.Collection("agreements"), logger)
-	variableRepo := repository.NewRepository(db.Collection("variables"), logger)
-	dbp.CreateBase(ctx, variableRepo, logger)
-	defer cancel()
-	agreementHandler := handler.NewAgreementHandler(agreementRepo, logger)
-	app.Get("/agreements/:id", agreementHandler.GetAgreementByID)
-	go func() {
-		startTasksWithVarRepo(logger, variableRepo)
-	}()
+	agreementRepo := repository.NewRepository(dbConn.Collection("agreements"), logger)
+	variableRepo := repository.NewRepository(dbConn.Collection("variables"), logger)
+	dbp.CreateBase(ctxTimeout, variableRepo, logger)
+	go tasks.StartTasks(mainCtx, logger, variableRepo)
+	app := setup.SetupFiberApp(&repository.Repositories{AgreementRepo: agreementRepo}, logger)
+
 	logger.Info("Сервер запущен на :8080")
 	if err := app.Listen(":8080"); err != nil {
 		logger.Fatal("Ошибка при запуске сервера", zap.Error(err))

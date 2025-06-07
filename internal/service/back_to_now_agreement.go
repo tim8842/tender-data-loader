@@ -12,7 +12,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 
 	"github.com/tim8842/tender-data-loader/internal/model"
-	"github.com/tim8842/tender-data-loader/internal/util"
+
+	"github.com/tim8842/tender-data-loader/internal/util/base"
+	"github.com/tim8842/tender-data-loader/internal/util/requests"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +33,7 @@ type PageInner struct {
 
 func GetUserAgent(ctx context.Context, url string, logger *zap.Logger) (*UserAgentResponse, error) {
 	var usStruct UserAgentResponse
-	res, err := util.GetRequest(ctx, url, 5*time.Second, logger)
+	res, err := requests.GetRequest(ctx, url, 5*time.Second, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +53,7 @@ func GetPage(ctx context.Context, inner PageInner, logger *zap.Logger) (interfac
 	if tmp, ok := inner.UserAgent.Proxy["url"].(string); ok {
 		proxyUrl = tmp
 	}
-	res, err := util.GetRequest(ctx, inner.Url, 5*time.Second, logger, util.RequestOptions{UserAgent: userAgent, ProxyUrl: proxyUrl})
+	res, err := requests.GetRequest(ctx, inner.Url, 5*time.Second, logger, requests.RequestOptions{UserAgent: userAgent, ProxyUrl: proxyUrl})
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +122,7 @@ func ParseAgreementFromMain(body []byte, logger *zap.Logger) (*model.Agreement, 
 		text := strings.TrimSpace(s.Text())
 		text = strings.ReplaceAll(text, "₽", "")
 		text = strings.ReplaceAll(text, ",", ".")
-		if price, err := util.ParsePriceToFloat(text); err == nil {
+		if price, err := base.ParsePriceToFloat(text); err == nil {
 			data.Price = price
 			return false // найдена первая цена
 		}
@@ -138,7 +140,7 @@ func ParseAgreementFromMain(body []byte, logger *zap.Logger) (*model.Agreement, 
 		texts := strings.Split(text, "—")
 		for idx, v := range texts {
 			text := strings.TrimSpace(v)
-			date, err := util.ParseDate(text)
+			date, err := base.ParseDate(text)
 			if err == nil {
 				switch i {
 				case 0:
@@ -239,18 +241,18 @@ func ParseAgreementFromHtml(body []byte, data *model.Agreement, logger *zap.Logg
 				case "Классификация по ОКПД2":
 					service.OKPD2 = cell.Text()
 				case "Количество (Объем)":
-					service.Quantity, _ = util.ParsePriceToFloat(cell.Text())
+					service.Quantity, _ = base.ParsePriceToFloat(cell.Text())
 				case "Единица измерения":
 					service.QuantityType = cell.Text()
 				case "Количество (объем), единица измерения":
 					tmp := strings.Split(cell.Text(), ",")
-					service.Quantity, _ = util.ParsePriceToFloat(strings.TrimSpace(tmp[0]))
+					service.Quantity, _ = base.ParsePriceToFloat(strings.TrimSpace(tmp[0]))
 					if len(tmp) > 1 {
 						service.QuantityType = strings.TrimSpace(tmp[1])
 					}
 				case "Цена за единицу":
 					tmp := strings.Split(cell.Text(), ",")
-					service.UnitPrice, _ = util.ParsePriceToFloat(strings.TrimSpace(tmp[0]))
+					service.UnitPrice, _ = base.ParsePriceToFloat(strings.TrimSpace(tmp[0]))
 					if len(tmp) > 1 {
 						service.Currency = strings.TrimSpace(tmp[1])
 					}

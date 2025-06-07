@@ -9,6 +9,11 @@ import (
 	"go.uber.org/zap"
 )
 
+type Repositories struct {
+	AgreementRepo IMongoRepository
+	// другие репозитории...
+}
+
 // IMongoRepository Interface for MongoDB operations
 type IMongoRepository interface {
 	Create(ctx context.Context, doc interface{}) error

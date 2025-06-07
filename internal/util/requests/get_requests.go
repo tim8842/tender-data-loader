@@ -1,4 +1,4 @@
-package util
+package requests
 
 import (
 	"context"
@@ -92,20 +92,3 @@ func GetRequest(ctx context.Context, url string, timeout time.Duration, logger *
 	}
 	return body, nil
 }
-
-// func GetRequestWithJson(ctx context.Context, url string, timeout time.Duration, logger *zap.Logger, options ...RequestOptions) (interface{}, error) {
-// 	// 7. Парсим JSON
-// 	body, err := GetRequest(ctx, url, timeout, logger, options...)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var data interface{}
-// 	err = json.Unmarshal(body, &data)
-// 	if err != nil {
-// 		logger.Error(fmt.Sprintf("Ошибка при парсинге JSON: %v, тело: %s", err, string(body)))
-// 		return nil, fmt.Errorf("ошибка при парсинге JSON: %w", err)
-// 	}
-
-// 	logger.Info(fmt.Sprintf("Запрос успешно выполнен, размер ответа: %d байт", len(body)))
-// 	return data, nil
-// }
