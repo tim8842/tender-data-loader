@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func SetupFiberApp(agreementRepo *repository.Repositories, logger *zap.Logger) *fiber.App {
+func SetupFiberApp(repositories *repository.Repositories, logger *zap.Logger) *fiber.App {
 	app := fiber.New()
 
 	app.Use(swagger.New(swagger.Config{
@@ -18,7 +18,7 @@ func SetupFiberApp(agreementRepo *repository.Repositories, logger *zap.Logger) *
 		Title:    "Swagger API Docs",
 	}))
 
-	agreementHandler := handler.NewAgreementHandler(agreementRepo.AgreementRepo, logger)
+	agreementHandler := handler.NewAgreementHandler(repositories, logger)
 	app.Get("/agreements/:id", agreementHandler.GetAgreementByID)
 
 	return app

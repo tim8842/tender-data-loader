@@ -8,11 +8,11 @@ import (
 	"go.uber.org/zap"
 )
 
-func CreateBase(ctx context.Context, variableRepo repository.IMongoRepository, logger *zap.Logger) error {
+func CreateBase(ctx context.Context, logger *zap.Logger, repositories *repository.Repositories) error {
 	modVar := model.Variable{ID: "back_to_now_agreement", Vars: map[string]any{"page": 50, "signed_at": "2011-02-02T00:00:00Z"}}
-	_, err := variableRepo.GetByID(ctx, modVar.ID)
+	_, err := repositories.VarRepo.GetByID(ctx, modVar.ID)
 	if err != nil {
-		err = variableRepo.Create(ctx, modVar)
+		err = repositories.VarRepo.Create(ctx, &modVar)
 		if err != nil {
 			logger.Error("Ошибка в создании базовы переменных " + err.Error())
 		}

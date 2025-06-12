@@ -1,6 +1,7 @@
-package util
+package logger
 
 import (
+	"io"
 	"os"
 
 	"go.uber.org/zap"
@@ -8,7 +9,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-func InitLogger(logDir string) (*zap.Logger, error) {
+func InitLogger(logDir string) (*zap.Logger, io.Closer, error) {
 	// Настраиваем lumberjack — файл логов + ротация
 	lumberjackLogger := &lumberjack.Logger{
 		Filename:   logDir + "/app.log", // путь к файлу
@@ -45,5 +46,5 @@ func InitLogger(logDir string) (*zap.Logger, error) {
 	core := zapcore.NewTee(fileCore, consoleCore)
 
 	logger := zap.New(core)
-	return logger, nil
+	return logger, lumberjackLogger, nil
 }

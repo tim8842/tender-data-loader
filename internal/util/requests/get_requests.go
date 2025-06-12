@@ -17,6 +17,11 @@ type RequestOptions struct {
 	ProxyUrl  string
 }
 
+type IRequester interface {
+	Get(ctx context.Context, logger *zap.Logger, url string, timeout time.Duration, opts ...*RequestOptions) ([]byte, error)
+}
+type Requester struct{}
+
 // getRequest выполняет HTTP GET-запрос к указанному URL и возвращает JSON-данные.
 //
 //	Параметры:
@@ -28,7 +33,8 @@ type RequestOptions struct {
 //	Возвращает:
 //	 - интерфейс{} (то есть map[string]interface{} или []interface{} в зависимости от JSON)
 //	 - ошибку (если произошла).
-func GetRequest(ctx context.Context, url string, timeout time.Duration, logger *zap.Logger, options ...RequestOptions) ([]byte, error) {
+
+func (d *Requester) Get(ctx context.Context, logger *zap.Logger, url string, timeout time.Duration, options ...*RequestOptions) ([]byte, error) {
 	// 1. Создаем контекст с таймаутом (если не передан)
 	if timeout > 0 {
 		var cancel context.CancelFunc
@@ -43,7 +49,7 @@ func GetRequest(ctx context.Context, url string, timeout time.Duration, logger *
 	}
 	client := &http.Client{}
 	// 3. Устанавливаем опции (User-Agent)
-	if len(options) > 0 {
+	if len(options) > 0 && options[0] != nil {
 		opts := options[0] // Берем первую опцию
 
 		// Устанавливаем User-Agent
@@ -70,7 +76,7 @@ func GetRequest(ctx context.Context, url string, timeout time.Duration, logger *
 
 	// 4. Выполняем запрос
 
-	logger.Info(fmt.Sprintf("Отправка запроса GET: %s", url))
+	logger.Debug(fmt.Sprintf("Отправка запроса GET: %s", url))
 	resp, err := client.Do(req)
 	if err != nil {
 		logger.Error(fmt.Sprintf("Ошибка при выполнении запроса: %v", err))

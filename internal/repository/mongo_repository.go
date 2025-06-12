@@ -3,40 +3,40 @@ package repository
 import (
 	"context"
 
+	"github.com/tim8842/tender-data-loader/internal/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 )
 
+type AgreementRepository interface {
+	GetByID(ctx context.Context, id string) (model.Agreement, error)
+}
+
 type Repositories struct {
-	AgreementRepo IMongoRepository
+	AgreementRepo IAgreementRepo
+	VarRepo       IVariableRepo
+	CustomerRepo  ICustomerRepo
 	// другие репозитории...
 }
 
-// IMongoRepository Interface for MongoDB operations
-type IMongoRepository interface {
-	Create(ctx context.Context, doc interface{}) error
-	CreateMany(ctx context.Context, docs []interface{}) error
-	GetByID(ctx context.Context, id string) (interface{}, error)
-	Update(ctx context.Context, id string, update interface{}) error
-	Delete(ctx context.Context, id string) error
-	List(ctx context.Context, filter interface{}, opts ...*options.FindOptions) ([]map[string]interface{}, error)
-}
-
-// MongoRepository Implementation of IMongoRepository using interface{}
-type MongoRepository struct {
+type GenericRepository[T BaseModel] struct {
 	collection *mongo.Collection
 	logger     *zap.Logger
 }
 
-// NewRepository Constructor for MongoRepository
-func NewRepository(collection *mongo.Collection, logger *zap.Logger) IMongoRepository {
-	return &MongoRepository{collection: collection, logger: logger}
+type BaseModel interface {
+	GetID() any
 }
 
-// Create Implements IMongoRepository.Create
-func (r *MongoRepository) Create(ctx context.Context, doc interface{}) error {
+// NewGenericRepository constructs a new GenericRepository[T]
+func NewGenericRepository[T BaseModel](coll *mongo.Collection, logger *zap.Logger) *GenericRepository[T] {
+	return &GenericRepository[T]{collection: coll, logger: logger}
+}
+
+// Create inserts a single document of type T
+func (r *GenericRepository[T]) Create(ctx context.Context, doc T) error {
 	_, err := r.collection.InsertOne(ctx, doc)
 	if err != nil {
 		r.logger.Error("Failed to insert document", zap.Error(err))
@@ -44,28 +44,59 @@ func (r *MongoRepository) Create(ctx context.Context, doc interface{}) error {
 	return err
 }
 
-// CreateMany Implements IMongoRepository.CreateMany
-func (r *MongoRepository) CreateMany(ctx context.Context, docs []interface{}) error {
-	_, err := r.collection.InsertMany(ctx, convertToInterfaceSlice(docs))
+// CreateMany inserts multiple documents of type T
+func (r *GenericRepository[T]) CreateMany(ctx context.Context, docs []T) error {
+	if len(docs) == 0 {
+		return nil
+	}
+	iface := make([]interface{}, len(docs))
+	for i, v := range docs {
+		iface[i] = v
+	}
+	_, err := r.collection.InsertMany(ctx, iface)
 	if err != nil {
 		r.logger.Error("Failed to insert documents", zap.Error(err))
 	}
 	return err
 }
 
-// GetByID Implements IMongoRepository.GetByID
-func (r *MongoRepository) GetByID(ctx context.Context, id string) (interface{}, error) {
-	var result map[string]interface{}
+func (r *GenericRepository[T]) BulkCreateOrUpdateMany(ctx context.Context, docs []T) error {
+	if len(docs) == 0 {
+		return nil
+	}
 
+	var models []mongo.WriteModel
+	for _, doc := range docs {
+		filter := bson.M{"_id": doc.GetID()}
+		replaceModel := mongo.NewReplaceOneModel().
+			SetFilter(filter).
+			SetReplacement(doc).
+			SetUpsert(true)
+
+		models = append(models, replaceModel)
+	}
+	_, err := r.collection.BulkWrite(ctx, models, options.BulkWrite().SetOrdered(false))
+	if err != nil {
+		r.logger.Error("Failed to perform bulk upsert operations", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+// GetByID retrieves a document by its ID and decodes into T
+func (r *GenericRepository[T]) GetByID(ctx context.Context, id string) (T, error) {
+	var result T
 	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&result)
 	if err != nil {
 		r.logger.Error("Failed to get document by ID", zap.String("id", id), zap.Error(err))
+		var zero T
+		return zero, err
 	}
-	return result, err
+	return result, nil
 }
 
-// Update Implements IMongoRepository.Update
-func (r *MongoRepository) Update(ctx context.Context, id string, update interface{}) error {
+// Update updates a document by its ID
+func (r *GenericRepository[T]) Update(ctx context.Context, id string, update T) error {
 	filter := bson.M{"_id": id}
 	_, err := r.collection.UpdateOne(ctx, filter, bson.M{"$set": update})
 	if err != nil {
@@ -74,8 +105,8 @@ func (r *MongoRepository) Update(ctx context.Context, id string, update interfac
 	return err
 }
 
-// Delete Implements IMongoRepository.Delete
-func (r *MongoRepository) Delete(ctx context.Context, id string) error {
+// Delete removes a document by its ID
+func (r *GenericRepository[T]) Delete(ctx context.Context, id string) error {
 	filter := bson.M{"_id": id}
 	_, err := r.collection.DeleteOne(ctx, filter)
 	if err != nil {
@@ -84,8 +115,8 @@ func (r *MongoRepository) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-// List Implements IMongoRepository.List
-func (r *MongoRepository) List(ctx context.Context, filter interface{}, opts ...*options.FindOptions) ([]map[string]interface{}, error) {
+// List finds documents matching a filter and decodes into []T
+func (r *GenericRepository[T]) List(ctx context.Context, filter interface{}, opts ...*options.FindOptions) ([]T, error) {
 	cursor, err := r.collection.Find(ctx, filter, opts...)
 	if err != nil {
 		r.logger.Error("Failed to list documents", zap.Error(err))
@@ -93,29 +124,26 @@ func (r *MongoRepository) List(ctx context.Context, filter interface{}, opts ...
 	}
 	defer cursor.Close(ctx)
 
-	var results []map[string]interface{}
-
+	var results []T
 	for cursor.Next(ctx) {
-		var elem map[string]interface{}
-
+		var elem T
 		if err := cursor.Decode(&elem); err != nil {
 			r.logger.Error("Failed to decode document from cursor", zap.Error(err))
 			return nil, err
 		}
 		results = append(results, elem)
 	}
-
 	if err := cursor.Err(); err != nil {
 		r.logger.Error("Cursor error after iteration", zap.Error(err))
+		return results, err
 	}
-	return results, err
+	return results, nil
 }
 
-// Helper function to convert []T to []interface{}
-func convertToInterfaceSlice[T any](docs []T) []interface{} {
-	interfaceDocs := make([]interface{}, len(docs))
-	for i, d := range docs {
-		interfaceDocs[i] = d
-	}
-	return interfaceDocs
+func (r *GenericRepository[T]) CountDocuments(ctx context.Context, filter interface{}) (int64, error) {
+	return r.collection.CountDocuments(ctx, filter)
+}
+
+func (r *GenericRepository[T]) ReturnCollection() *mongo.Collection {
+	return r.collection
 }

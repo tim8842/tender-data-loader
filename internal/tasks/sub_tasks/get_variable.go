@@ -10,11 +10,11 @@ import (
 )
 
 type GetVariableBackToNowAgreementById struct {
-	variableRepo repository.IMongoRepository
+	variableRepo repository.IVariableRepo
 	id           string
 }
 
-func NewGetVariableBackToNowAgreementById(variableRepo repository.IMongoRepository, id string) *GetVariableBackToNowAgreementById {
+func NewGetVariableBackToNowAgreementById(variableRepo repository.IVariableRepo, id string) *GetVariableBackToNowAgreementById {
 	return &GetVariableBackToNowAgreementById{variableRepo: variableRepo, id: id}
 }
 

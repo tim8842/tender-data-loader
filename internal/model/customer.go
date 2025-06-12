@@ -9,3 +9,7 @@ type Customer struct {
 	MainWork string `bson:"main_work" json:"main_work"`
 	Location string `bson:"location" json:"location"` // Место нахождения
 }
+
+func (t Customer) GetID() any {
+	return t.ID
+}

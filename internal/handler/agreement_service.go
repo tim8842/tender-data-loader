@@ -1,25 +1,30 @@
 package handler
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/tim8842/tender-data-loader/internal/model"
 	"github.com/tim8842/tender-data-loader/internal/repository"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
 )
 
 // AgreementHandler обрабатывает запросы к договорам
 type AgreementHandler struct {
-	repo   repository.IMongoRepository
-	logger *zap.Logger
+	repositories *repository.Repositories
+	logger       *zap.Logger
 }
 
 // NewAgreementHandler создает новый handler
 func NewAgreementHandler(
-	repo repository.IMongoRepository,
+	repositories *repository.Repositories,
 	logger *zap.Logger,
 ) *AgreementHandler {
 	return &AgreementHandler{
-		repo:   repo,
-		logger: logger,
+		repositories: repositories,
+		logger:       logger,
 	}
 }
 
@@ -37,11 +42,24 @@ func (h *AgreementHandler) GetAgreementByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	h.logger.Info("Получение договора", zap.String("id", id))
-	agreement, err := h.repo.GetByID(c.Context(), id)
+	agreement, err := h.repositories.AgreementRepo.GetByID(c.Context(), id)
+	if agreement != nil {
+		agreement.Services = []*model.AgreementService{}
+	}
 	if err != nil {
-		h.logger.Warn("Договор не найден", zap.String("id", id), zap.Error(err))
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "agreement not found",
+
+		if errors.Is(err, mongo.ErrNoDocuments) || strings.Contains(err.Error(), "not found") {
+			// Ошибка "не найдено" - возвращаем 404
+			h.logger.Warn("Договор не найден", zap.String("id", id), zap.Error(err))
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "agreement not found",
+			})
+		}
+
+		// Все остальные ошибки - возвращаем 500
+		h.logger.Error("Ошибка при получении договора", zap.String("id", id), zap.Error(err))
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "internal server error",
 		})
 	}
 
