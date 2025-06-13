@@ -18,10 +18,18 @@ pipeline {
         URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB="https://zakupki.gov.ru/epz/contractfz223/card/contract-info.html?id="
         URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML="https://zakupki.gov.ru/223/contract/public/contract/print-form/show.html?pfid="
         URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB="https://zakupki.gov.ru/epz/organization/view223/info.html?agencyId="
-
     }
 
     stages {
+        stage('Notify pending') {
+            steps {
+                script {
+                    // Отправляем статус pending в GitHub
+                    githubNotify status: 'PENDING', description: 'Build started', context: 'jenkins/go-tests'
+                }
+            }
+        }
+
         stage('Setup Go') {
             steps {
                 script {
@@ -57,7 +65,9 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                sh '''cat <<EOF > .env.test
+                script {
+                    try {
+                        sh '''cat <<EOF > .env.test
 MONGO_HOST=$MONGO_HOST
 MONGO_PORT=$MONGO_PORT
 MONGO_USER=$MONGO_USER
@@ -71,22 +81,35 @@ URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB=$URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_W
 URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML=$URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML
 URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB=$URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB
 EOF
-                set -a
-                source .env.test
-                set +a
-                go test ./...
-                '''
+                        set -a
+                        source .env.test
+                        set +a
+                        go test ./...
+                        '''
+                    } catch (err) {
+                        // Выводим ошибку тестов в лог
+                        echo "Tests failed with error: ${err}"
+                        // Обновляем статус в GitHub
+                        githubNotify status: 'FAILURE', description: 'Tests failed', context: 'jenkins/go-tests'
+                        error("Failing pipeline because tests failed")
+                    }
+                }
             }
         }
     }
 
     post {
         success {
-            echo "Tests passed!"
+            script {
+                githubNotify status: 'SUCCESS', description: 'Tests passed', context: 'jenkins/go-tests'
+                echo "Tests passed!"
+            }
         }
         failure {
-            echo "Tests failed!"
-            error("Stopping pipeline because tests failed.")
+            script {
+                githubNotify status: 'FAILURE', description: 'Pipeline failed', context: 'jenkins/go-tests'
+                echo "Tests failed!"
+            }
         }
     }
 }
