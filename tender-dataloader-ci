@@ -18,7 +18,7 @@ pipeline {
     //     URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB = "https://zakupki.gov.ru/epz/contractfz223/card/contract-info.html?id="
     //     URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML = "https://zakupki.gov.ru/223/contract/public/contract/print-form/show.html?pfid="
     //     URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB = "https://zakupki.gov.ru/epz/organization/view223/info.html?agencyId="
-    }
+    // }
 
     stages {
         stage('Setup Go') {
