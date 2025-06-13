@@ -27,12 +27,17 @@ pipeline {
                     def goInstalled = sh(script: "go version", returnStatus: true) == 0
                     if (!goInstalled) {
                         echo "Go not found, installing Go ${GO_VERSION}..."
-                        sh """
-                            wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
-                            sudo rm -rf ${GO_ROOT}
-                            sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
-                            rm go${GO_VERSION}.linux-amd64.tar.gz
-                        """
+
+                        withCredentials([string(credentialsId: 'SUDO_PASSWORD_ID', variable: 'SUDO_PASS')]) {
+                            sh """
+                                wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+                                set +x
+                                echo "$SUDO_PASS" | sudo -S rm -rf ${GO_ROOT}
+                                echo "$SUDO_PASS" | sudo -S tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+                                set -x
+                                rm go${GO_VERSION}.linux-amd64.tar.gz
+                            """
+                        }
                     } else {
                         echo "Go is already installed"
                     }
