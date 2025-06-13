@@ -1,0 +1,92 @@
+ipeline {
+    agent any
+
+    environment {
+        GO_VERSION = "1.20.5"
+        GO_ROOT = "/usr/local/go"
+        GO_BIN = "${GO_ROOT}/bin"
+        PATH = "${GO_BIN}:${env.PATH}"
+        MONGO_USER=credentials("MONGO_USER")
+        MONGO_PASSWORD=credentials("MONGO_PASSWORD")
+        MONGO_HOST="localhost"
+        MONGO_PORT="27017"
+        URL_GET_PROXY="http://83.222.25.147/api/v1/random-user"
+        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST="https://zakupki.gov.ru/epz/contractfz223/search/results.html?morphology=on&search-filter=Дате+размещения&statuses_1=on&statuses_2=on&statuses_3=on&statuses=1,2,3&currencyId=-1&contract223DateFrom="
+        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND="&contract223DateTo="
+        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD="&sortBy=BY_UPDATE_DATE&pageNumber="
+        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH="&sortDirection=true&recordsPerPage=_50&showLotsInfoHidden=false"
+        URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB="https://zakupki.gov.ru/epz/contractfz223/card/contract-info.html?id="
+        URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML="https://zakupki.gov.ru/223/contract/public/contract/print-form/show.html?pfid="
+        URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB="https://zakupki.gov.ru/epz/organization/view223/info.html?agencyId="
+
+    }
+
+    stages {
+        stage('Setup Go') {
+            steps {
+                script {
+                    def goInstalled = sh(script: "go version", returnStatus: true) == 0
+                    if (!goInstalled) {
+                        echo "Go not found, installing Go ${GO_VERSION}..."
+                        sh """
+                            wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+                            sudo rm -rf ${GO_ROOT}
+                            sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+                            rm go${GO_VERSION}.linux-amd64.tar.gz
+                        """
+                    } else {
+                        echo "Go is already installed"
+                    }
+                }
+                sh "go version"
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Prepare dependencies') {
+            steps {
+                sh 'go mod tidy'
+                sh 'go mod download'
+            }
+        }
+
+        stage('Run tests') {
+            steps {
+                sh '''cat <<EOF > .env.test
+MONGO_HOST=$MONGO_HOST
+MONGO_PORT=$MONGO_PORT
+MONGO_USER=$MONGO_USER
+MONGO_PASSWORD=$MONGO_PASSWORD
+URL_GET_PROXY=$URL_GET_PROXY
+URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST=$URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST
+URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND=$URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND
+URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD=$URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD
+URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH=$URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH
+URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB=$URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB
+URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML=$URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML
+URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB=$URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB
+EOF
+                set -a
+                source .env.test
+                set +a
+                go test ./...
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Tests passed!"
+        }
+        failure {
+            echo "Tests failed!"
+            error("Stopping pipeline because tests failed.")
+        }
+    }
+}
