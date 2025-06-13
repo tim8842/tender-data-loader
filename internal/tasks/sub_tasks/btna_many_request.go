@@ -164,6 +164,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 		res = append(res, msg)
 	}
 	if len(res) == 0 {
+		logger.Error("No correct data, empty")
 		mainErr = errors.New("no correct data, empty")
 	}
 	logger.Info("Main: all requests finished")

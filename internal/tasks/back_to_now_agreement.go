@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/tim8842/tender-data-loader/internal/config"
@@ -102,7 +103,7 @@ outer:
 			if err != nil {
 				logger.Error("ParseAgreementIds error ", zap.Error(err))
 				mainErr = err
-				break
+				break outer
 			}
 			ids, ok := tmp.([]string)
 			if !ok {
@@ -125,13 +126,29 @@ outer:
 					mainErr = err
 					continue outer
 				}
-				continue
+				continue outer
 			}
 			// Запускаем подзадачу, которая делает параллельные 50 запросов и парсит данные
-			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, subtasks.NewBtnaManyRequests(t.cfg, ids))
+			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, subtasks.NewBtnaManyRequests(t.cfg, ids))
 			if err != nil {
 				logger.Error("Error subtasks.NewBtnaManyRequests", zap.Error(err))
 				mainErr = err
+				if strings.Contains(err.Error(), "no correct data, empty") {
+					varData.Vars.SignedAt = varData.Vars.SignedAt.Add(24 * time.Hour)
+					varData.Vars.Page = 1
+					vData, err := varData.ConvertToVariable()
+					if err != nil {
+						logger.Error("Error ConvertToVariable ", zap.Error(err))
+						mainErr = err
+						break outer
+					}
+					err = t.repositories.VarRepo.Update(ctx, varData.ID, &vData)
+					if err != nil {
+						logger.Error("Update data SignedAt agreement error ", zap.Error(err))
+						mainErr = err
+						continue outer
+					}
+				}
 				continue outer
 			}
 			arrData, ok := tmp.([]*model.AgreementParesedData)
@@ -160,7 +177,13 @@ outer:
 				mainErr = err
 				continue outer
 			}
-			varData.Vars.Page = varData.Vars.Page + 1
+			if varData.Vars.Page < 100 {
+				varData.Vars.Page = varData.Vars.Page + 1
+			} else {
+				varData.Vars.Page = 1
+				varData.Vars.SignedAt = varData.Vars.SignedAt.Add(24 * time.Hour)
+			}
+
 			vData, err := varData.ConvertToVariable()
 			if err != nil {
 				logger.Error("Error ConvertToVariable ", zap.Error(err))
