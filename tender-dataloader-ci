@@ -53,8 +53,6 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                sh 'cat .env.test'
-                sh 'source .env.test'
                 sh 'go test ./...'
             }
         }
