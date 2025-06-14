@@ -54,8 +54,7 @@ pipeline {
         stage('Run tests') {
             steps {
                 // sh 'go test ./...'
-                sh 'ls -la'
-                sh 'go test cmd/data-loader-service/main_test.go'
+                sh 'go test ./cmd/data-loader-service/'
             }
         }
     }
