@@ -5,7 +5,7 @@ pipeline {
         stage('Install Go') {
             steps {
                 sh '''
-                    if ! command -v go versoin >/dev/null 2>&1
+                    if command -v go >/dev/null 2>&1
                     then
                         echo "Go is already installed"
                         go version
