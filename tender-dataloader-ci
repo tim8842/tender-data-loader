@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-        stage('Run tests') {
+        stage('Setup .env file') {
             steps {
                 writeFile(
                     file: ".env.test",
@@ -48,7 +48,14 @@ pipeline {
                         URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB=${URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB}
                     """
                 )
+            }
+        }
+
+        stage('Run tests') {
+            steps {
                 sh 'cat .env.test'
+                sh 'source .env.test'
+                sh 'go test ./...'
             }
         }
     }
