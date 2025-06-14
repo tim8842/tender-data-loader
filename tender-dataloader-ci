@@ -38,8 +38,6 @@ pipeline {
                     text: """
                         MONGO_HOST=${MONGO_HOST}
                         MONGO_PORT=${MONGO_PORT}
-                        MONGO_USER=${MONGO_USER}
-                        MONGO_PASSWORD=${MONGO_PASSWORD}
                         URL_GET_PROXY=${URL_GET_PROXY}
                         URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST=${URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST}
                         URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND=${URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND}
