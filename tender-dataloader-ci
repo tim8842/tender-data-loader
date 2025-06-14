@@ -53,8 +53,7 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                // sh 'go test ./...'
-                sh 'go test ./cmd/data-loader-service/'
+                sh 'go test ./...'
             }
         }
     }
