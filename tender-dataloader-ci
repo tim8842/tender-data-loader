@@ -1,23 +1,12 @@
 pipeline {
     agent any
 
+    tools { go '1.24.4' }
+
     stages {
-        stage('Install Go') {
+        stage('Go version') {
             steps {
-                sh '''
-                    if command -v go >/dev/null 2>&1
-                    then
-                        echo "Go is already installed"
-                        go version
-                    else
-                        curl -O https://go.dev/dl/go1.24.4.linux-amd64.tar.gz
-                        tar -C /usr/local -xzf go1.24.4.linux-amd64.tar.gz
-                        echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
-                        rm go1.24.4.linux-amd64.tar.gz
-                        echo "Go installed"
-                        go version
-                    fi
-                '''
+                sh 'go version'
             }
         }
     }
