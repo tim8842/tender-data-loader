@@ -28,7 +28,6 @@ pipeline {
         stage('Prepare dependencies') {
             steps {
                 sh 'go mod tidy'
-                sh 'go '
             }
         }
 
