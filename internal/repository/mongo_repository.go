@@ -10,6 +10,20 @@ import (
 	"go.uber.org/zap"
 )
 
+type IAgreementRepo interface {
+	GetByID(ctx context.Context, id string) (*model.Agreement, error)
+	BulkMergeMany(ctx context.Context, docs []*model.Agreement) error
+}
+type IVariableRepo interface {
+	GetByID(ctx context.Context, id string) (*model.Variable, error)
+	Update(ctx context.Context, id string, data *model.Variable) error
+	Create(ctx context.Context, doc *model.Variable) error
+}
+
+type ICustomerRepo interface {
+	BulkMergeMany(ctx context.Context, docs []*model.Customer) error
+}
+
 type AgreementRepository interface {
 	GetByID(ctx context.Context, id string) (model.Agreement, error)
 }

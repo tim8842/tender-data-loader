@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -40,8 +41,11 @@ func clearEnvVars(keys []string) {
 func TestLoadConfig_Successful(t *testing.T) {
 	envVars := setEnvVars()
 	defer clearEnvVars([]string{"MONGO_USER", "MONGO_PASSWORD", "MONGO_HOST", "MONGO_PORT", "URL_GET_PROXY"})
-
-	cfg, err := LoadConfig()
+	envPath, err := filepath.Abs("../../.env.test")
+	if err != nil {
+		panic(err)
+	}
+	cfg, err := LoadConfig(envPath)
 	assert.Nil(t, err)
 	assert.NotNil(t, cfg)
 
@@ -58,7 +62,11 @@ func TestLoadConfig_DefaultValues(t *testing.T) {
 	_ = setEnvVars()
 	clearEnvVars([]string{"MONGO_DB", "PORT"})
 	defer clearEnvVars([]string{"MONGO_USER", "MONGO_PASSWORD", "MONGO_HOST", "MONGO_PORT", "URL_GET_PROXY"})
-	cfg, err := LoadConfig()
+	envPath, err := filepath.Abs("../../.env.test")
+	if err != nil {
+		panic(err)
+	}
+	cfg, err := LoadConfig(envPath)
 	assert.Nil(t, err)
 	assert.Equal(t, "tenderdb", cfg.MongoDB)
 	assert.Equal(t, "8080", cfg.Port)
@@ -66,7 +74,11 @@ func TestLoadConfig_DefaultValues(t *testing.T) {
 
 // Тестируем случай, когда отсутствуют необходимые переменные
 func TestLoadConfig_MissingRequiredVar(t *testing.T) {
-	_, err := LoadConfig()
+	envPath, err := filepath.Abs("../../.env.test")
+	if err != nil {
+		panic(err)
+	}
+	_, err = LoadConfig(envPath)
 	assert.Error(t, err)
 	assert.True(t, strings.Contains(err.Error(), "отсутствует обязательная переменная"))
 }

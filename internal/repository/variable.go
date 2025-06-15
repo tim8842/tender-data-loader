@@ -6,12 +6,6 @@ import (
 	"github.com/tim8842/tender-data-loader/internal/model"
 )
 
-type IVariableRepo interface {
-	GetByID(ctx context.Context, id string) (*model.Variable, error)
-	Update(ctx context.Context, id string, data *model.Variable) error
-	Create(ctx context.Context, doc *model.Variable) error
-}
-
 type VariableRepo struct {
 	*GenericRepository[*model.Variable]
 }

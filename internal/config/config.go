@@ -24,8 +24,11 @@ type Config struct {
 	UrlZakupkiAgreementGetCustomerWeb        string
 }
 
-func LoadConfig() (*Config, error) {
-	_ = godotenv.Load()
+func LoadConfig(fileToEnv string) (*Config, error) {
+	err := godotenv.Load(fileToEnv)
+	if err != nil {
+		panic("can not initialize logger")
+	}
 
 	cfg := &Config{
 		MongoUser:                                os.Getenv("MONGO_USER"),

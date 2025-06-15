@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/tim8842/tender-data-loader/internal/config"
@@ -322,12 +321,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-
-	if err := godotenv.Load(envPath); err != nil {
-		panic("Error loading .env file")
-	}
 	logger := zaptest.NewLogger(t)
-	cfg, _ := config.LoadConfig()
+	cfg, _ := config.LoadConfig(envPath)
 	for _, tt := range tests {
 		ctx, cancelled := context.WithTimeout(context.Background(), 20*time.Microsecond)
 		Now = tt.now
