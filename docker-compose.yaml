@@ -1,0 +1,14 @@
+services:
+  mongo:
+    image: mongo:8.0.9
+    container_name: mongodb-tender
+    restart: always
+    ports:
+      - "27017:27017"  # Открываем порт для доступа к MongoDB (для разработки/тестирования)
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db  # Named volume для данных MongoDB
+volumes:
+  mongodb_data:
