@@ -21,8 +21,10 @@ func TestInitLogger(t *testing.T) {
 	log.Info("test log message")
 
 	// Закрываем логгер, чтобы сбросить буферы
-	_ = log.Sync()
-	_ = closer.Close()
+	err = log.Sync()
+	assert.NoError(t, err)
+	err = closer.Close()
+	assert.NoError(t, err)
 	// Проверяем, что файл лога был создан
 	logFilePath := filepath.Join(tempDir, "app.log")
 	_, err = os.Stat(logFilePath)
