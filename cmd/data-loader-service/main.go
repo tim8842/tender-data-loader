@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	"log"
+	"path/filepath"
 	"time"
 
 	"github.com/tim8842/tender-data-loader/internal/config"
-	loggerPackage "github.com/tim8842/tender-data-loader/internal/logger"
+	"github.com/tim8842/tender-data-loader/internal/logger"
 	"github.com/tim8842/tender-data-loader/internal/model"
 	"github.com/tim8842/tender-data-loader/internal/repository"
 	"github.com/tim8842/tender-data-loader/internal/setup"
 	"github.com/tim8842/tender-data-loader/internal/tasks"
-	dbp "github.com/tim8842/tender-data-loader/pkg/db"
+	"github.com/tim8842/tender-data-loader/pkg/db/mongo"
 	"go.uber.org/zap"
 )
 
@@ -28,20 +29,24 @@ func main() {
 	defer cancel()
 	defer cancelTimeout()
 	// Загрузка логера
-	logger, _, err := loggerPackage.InitLogger("./logs", 100, 7, 30, true)
+	lgr, _, err := logger.InitLogger("./logs", 100, 7, 30, true)
 	if err != nil {
 		log.Fatalf("Ошибка инициализации логгера: %v", err)
 	}
-	defer logger.Sync()
-	logger.Info("Логгер инициализирован")
+	defer lgr.Sync()
+	lgr.Info("Логгер инициализирован")
 	// Загрузка конфига
-	cfg, err := config.LoadConfig()
+	envPath, err := filepath.Abs(".env")
+	if err != nil {
+		panic(err)
+	}
+	cfg, err := config.LoadConfig(envPath)
 	if err != nil {
 		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 	client, dbConn, err := setup.SetupMongo(
 		ctxTimeout,
-		logger,
+		lgr,
 		&setup.MongoConfig{
 			User: cfg.MongoUser, Password: cfg.MongoPassword,
 			Host: cfg.MongoHost, Port: cfg.MongoPort,
@@ -49,22 +54,22 @@ func main() {
 		},
 	)
 	if err != nil {
-		logger.Fatal("Ошибка подключеник к монго", zap.Error(err))
+		log.Fatal("Ошибка подключеник к монго", zap.Error(err))
 	}
 	defer client.Disconnect(mainCtx)
-	genAgreeRepo := repository.NewGenericRepository[*model.Agreement](dbConn.Collection("agreements"), logger)
+	genAgreeRepo := repository.NewGenericRepository[*model.Agreement](dbConn.Collection("agreements"), lgr)
 	agreementRepo := &repository.AgreementRepo{GenericRepository: genAgreeRepo}
-	genVarRepo := repository.NewGenericRepository[*model.Variable](dbConn.Collection("variables"), logger)
+	genVarRepo := repository.NewGenericRepository[*model.Variable](dbConn.Collection("variables"), lgr)
 	variableRepo := &repository.VariableRepo{GenericRepository: genVarRepo}
-	genCustomerRepo := repository.NewGenericRepository[*model.Customer](dbConn.Collection("customers"), logger)
+	genCustomerRepo := repository.NewGenericRepository[*model.Customer](dbConn.Collection("customers"), lgr)
 	customerRepo := &repository.CustomerRepo{GenericRepository: genCustomerRepo}
 	repositories := &repository.Repositories{AgreementRepo: agreementRepo, CustomerRepo: customerRepo, VarRepo: variableRepo}
-	dbp.CreateBase(ctxTimeout, logger, repositories)
-	go tasks.StartTasks(mainCtx, logger, cfg, repositories)
-	app := setup.SetupFiberApp(repositories, logger)
+	mongo.CreateBase(ctxTimeout, lgr, repositories)
+	go tasks.StartTasks(mainCtx, lgr, cfg, repositories)
+	app := setup.SetupFiberApp(repositories, lgr)
 
-	logger.Info("Сервер запущен на :8080")
-	if err := app.Listen(":8080"); err != nil {
-		logger.Fatal("Ошибка при запуске сервера", zap.Error(err))
+	lgr.Info("Сервер запущен на :" + cfg.Port)
+	if err := app.Listen(":" + cfg.Port); err != nil {
+		lgr.Fatal("Ошибка при запуске сервера", zap.Error(err))
 	}
 }

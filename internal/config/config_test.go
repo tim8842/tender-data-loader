@@ -74,11 +74,7 @@ func TestLoadConfig_DefaultValues(t *testing.T) {
 
 // Тестируем случай, когда отсутствуют необходимые переменные
 func TestLoadConfig_MissingRequiredVar(t *testing.T) {
-	envPath, err := filepath.Abs("../../.env.test")
-	if err != nil {
-		panic(err)
-	}
-	_, err = LoadConfig(envPath)
+	_, err := LoadConfig(".env.test.without.req")
 	assert.Error(t, err)
 	assert.True(t, strings.Contains(err.Error(), "отсутствует обязательная переменная"))
 }
