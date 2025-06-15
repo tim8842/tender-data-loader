@@ -9,14 +9,14 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-func InitLogger(logDir string) (*zap.Logger, io.Closer, error) {
+func InitLogger(logDir string, maxSize int, maxBackups int, maxAge int, compress bool) (*zap.Logger, io.Closer, error) {
 	// Настраиваем lumberjack — файл логов + ротация
 	lumberjackLogger := &lumberjack.Logger{
 		Filename:   logDir + "/app.log", // путь к файлу
-		MaxSize:    100,                 // Мб до ротации
-		MaxBackups: 7,                   // сколько резервных файлов хранить
-		MaxAge:     30,                  // дней хранить логи
-		Compress:   true,                // сжимать старые логи
+		MaxSize:    maxSize,             // Мб до ротации
+		MaxBackups: maxBackups,          // сколько резервных файлов хранить
+		MaxAge:     maxAge,              // дней хранить логи
+		Compress:   compress,            // сжимать старые логи
 	}
 
 	// Создаём Writer, который пишет в lumberjack

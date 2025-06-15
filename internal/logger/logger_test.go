@@ -13,7 +13,7 @@ func TestInitLogger(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Инициализируем логгер
-	log, closer, err := InitLogger(tempDir)
+	log, closer, err := InitLogger(tempDir, 100, 7, 30, true)
 	assert.NoError(t, err)
 	assert.NotNil(t, log)
 

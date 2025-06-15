@@ -28,7 +28,7 @@ func main() {
 	defer cancel()
 	defer cancelTimeout()
 	// Загрузка логера
-	logger, _, err := loggerPackage.InitLogger("./logs")
+	logger, _, err := loggerPackage.InitLogger("./logs", 100, 7, 30, true)
 	if err != nil {
 		log.Fatalf("Ошибка инициализации логгера: %v", err)
 	}
