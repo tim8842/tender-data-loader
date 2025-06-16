@@ -1,0 +1,124 @@
+basePath: /
+definitions:
+  model.Agreement:
+    properties:
+      customer:
+        allOf:
+        - $ref: '#/definitions/model.Customer'
+        description: вложенный заказчик
+      execution_end:
+        description: конец срока исполнения
+        type: string
+      execution_start:
+        description: начало срока исполнения
+        type: string
+      id:
+        description: номер договора (идентификатор)
+        type: string
+      price:
+        description: цена договора
+        type: number
+      published_at:
+        description: дата размещения
+        type: string
+      purchase_method:
+        description: способ закупки
+        type: string
+      services:
+        description: список услуг
+        items:
+          $ref: '#/definitions/model.AgreementService'
+        type: array
+      signed_at:
+        description: дата заключения
+        type: string
+      subject:
+        description: предмет договора
+        type: string
+      updated_at:
+        description: дата обновления
+        type: string
+    type: object
+  model.AgreementService:
+    properties:
+      country_of_origin:
+        description: страна происхождения (опционально)
+        type: string
+      country_registered:
+        description: страна регистрации (опционально)
+        type: string
+      name:
+        description: наименование
+        type: string
+      okpd:
+        description: ОКПД (опционально)
+        type: string
+      okpd2:
+        description: ОКПД2 (опционально)
+        type: string
+      quantity:
+        description: количество
+        type: number
+      unit_price:
+        description: цена за единицу
+        type: number
+    type: object
+  model.Customer:
+    properties:
+      customer_code:
+        description: Идентификационный код заказчика
+        type: string
+      id:
+        description: Mongo ID
+        type: string
+      inn:
+        description: ИНН
+        type: string
+      location:
+        description: Место нахождения
+        type: string
+      name:
+        description: Название заказчика
+        type: string
+      okopf:
+        description: Организационно-правовая форма
+        type: string
+      url:
+        description: URL заказчика
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для работы с договорами
+  title: Tender API
+  version: "1.0"
+paths:
+  /agreements/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает договор по его ID
+      parameters:
+      - description: ID договора
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Agreement'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить договор по ID
+      tags:
+      - agreements
+swagger: "2.0"
