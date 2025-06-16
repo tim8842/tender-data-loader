@@ -75,7 +75,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				urlWebPage := cfg.UrlZakupkiAgreementGetAgreegmentWeb + ids[i]
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetPage(urlWebPage, userAgentResponse))
 				if err != nil {
-					mainErr = err
+					logger.Error("Agreement web get err ", zap.Error(err))
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -113,7 +113,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					urlShowHtml := cfg.UrlZakupkiAgreementGetAgreegmentShowHtml + data.Pfid
 					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetPage(urlShowHtml, userAgentResponse))
 					if err != nil {
-						mainErr = err
+						logger.Error("Agreement html show get err ", zap.Error(err))
 						return
 					}
 					tmpByte, ok = tmp.([]byte)
@@ -151,7 +151,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				urlCustomerWeb := cfg.UrlZakupkiAgreementGetCustomerWeb + data.Customer.ID
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetPage(urlCustomerWeb, userAgentResponse))
 				if err != nil {
-					mainErr = err
+					logger.Error("Customer get err ", zap.Error(err))
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
