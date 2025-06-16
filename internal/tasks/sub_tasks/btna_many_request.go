@@ -15,16 +15,17 @@ import (
 )
 
 type SBtnaManyRequests struct {
-	cfg *config.Config
-	ids []string
+	cfg         *config.Config
+	ids         []string
+	staticProxy bool
 }
 
-func NewBtnaManyRequests(cfg *config.Config, ids []string) *SBtnaManyRequests {
-	return &SBtnaManyRequests{cfg: cfg, ids: ids}
+func NewBtnaManyRequests(cfg *config.Config, ids []string, staticProxy bool) *SBtnaManyRequests {
+	return &SBtnaManyRequests{cfg: cfg, ids: ids, staticProxy: staticProxy}
 }
 
 func (t SBtnaManyRequests) Process(ctx context.Context, logger *zap.Logger) (any, error) {
-	data, ok := BtnaManyRequests(ctx, logger, t.cfg, t.ids)
+	data, ok := BtnaManyRequests(ctx, logger, t.cfg, t.ids, t.staticProxy)
 	if ok != nil {
 		return nil, ok
 	}
@@ -33,7 +34,7 @@ func (t SBtnaManyRequests) Process(ctx context.Context, logger *zap.Logger) (any
 
 var funcWrapper = wrappers.FuncWrapper
 
-func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Config, ids []string) (any, error) {
+func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Config, ids []string, staticProxy bool) (any, error) {
 	lenNums := len(ids)
 	results := make(chan *model.AgreementParesedData, lenNums)
 	var res []*model.AgreementParesedData
@@ -54,18 +55,22 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				var ok bool
 				var err error
 				var tmpByte []byte
+				userAgentResponse := &model.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"}, Proxy: map[string]any{"url": nil}} // Если часто таймаут на серваке
 				urlProx := cfg.UrlGetProxy
-				// Получаем прокси
-				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetRequest(urlProx))
-				if err != nil {
-					mainErr = err
-					return
+				if !staticProxy {
+					// Получаем прокси
+					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetRequest(urlProx))
+					if err != nil {
+						mainErr = err
+						return
+					}
+					userAgentResponse, ok = tmp.(*model.UserAgentResponse)
+					if !ok {
+						mainErr = errors.New("parse error *model.UserAgentResponse")
+						return
+					}
 				}
-				userAgentResponse, ok := tmp.(*model.UserAgentResponse)
-				if !ok {
-					mainErr = errors.New("parse error *model.UserAgentResponse")
-					return
-				}
+
 				// Делаем запрос по каждому id
 				urlWebPage := cfg.UrlZakupkiAgreementGetAgreegmentWeb + ids[i]
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetPage(urlWebPage, userAgentResponse))
@@ -91,33 +96,37 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				}
 				data.ID = ids[i]
 				// Получаем прокси
-				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetRequest(urlProx))
-				if err != nil {
-					mainErr = err
-					return
-				}
-				userAgentResponse, ok = tmp.(*model.UserAgentResponse)
-				if !ok {
-					mainErr = errors.New("parse error *model.UserAgentResponse")
-					return
+				if !staticProxy {
+					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetRequest(urlProx))
+					if err != nil {
+						mainErr = err
+						return
+					}
+					userAgentResponse, ok = tmp.(*model.UserAgentResponse)
+					if !ok {
+						mainErr = errors.New("parse error *model.UserAgentResponse")
+						return
+					}
 				}
 				// Получаем html show
-				urlShowHtml := cfg.UrlZakupkiAgreementGetAgreegmentShowHtml + data.Pfid
-				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetPage(urlShowHtml, userAgentResponse))
-				if err != nil {
-					mainErr = err
-					return
-				}
-				tmpByte, ok = tmp.([]byte)
-				if !ok {
-					mainErr = errors.New("parse error []byte")
-					return
-				}
-				// Парсим show
-				_, err = funcWrapper(ctx, logger, 1, 5*time.Second, NewParseDataInAgreementParesedData(tmpByte, backtonowagreementservice.ParseAgreementFromHtml, data))
-				if err != nil {
-					mainErr = err
-					return
+				if data.Pfid != "" {
+					urlShowHtml := cfg.UrlZakupkiAgreementGetAgreegmentShowHtml + data.Pfid
+					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetPage(urlShowHtml, userAgentResponse))
+					if err != nil {
+						mainErr = err
+						return
+					}
+					tmpByte, ok = tmp.([]byte)
+					if !ok {
+						mainErr = errors.New("parse error []byte")
+						return
+					}
+					// Парсим show
+					_, err = funcWrapper(ctx, logger, 1, 5*time.Second, NewParseDataInAgreementParesedData(tmpByte, backtonowagreementservice.ParseAgreementFromHtml, data))
+					if err != nil {
+						mainErr = err
+						return
+					}
 				}
 				// _, ok = tmp.(*model.AgreementParesedData)
 				// if !ok {
@@ -126,15 +135,17 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				// 	return
 				// }
 				// Получаем прокси
-				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetRequest(urlProx))
-				if err != nil {
-					mainErr = err
-					return
-				}
-				userAgentResponse, ok = tmp.(*model.UserAgentResponse)
-				if !ok {
-					mainErr = errors.New("parse error *model.UserAgentResponse")
-					return
+				if !staticProxy {
+					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, NewGetRequest(urlProx))
+					if err != nil {
+						mainErr = err
+						return
+					}
+					userAgentResponse, ok = tmp.(*model.UserAgentResponse)
+					if !ok {
+						mainErr = errors.New("parse error *model.UserAgentResponse")
+						return
+					}
 				}
 				// Получаем страницу customer
 				urlCustomerWeb := cfg.UrlZakupkiAgreementGetCustomerWeb + data.Customer.ID
