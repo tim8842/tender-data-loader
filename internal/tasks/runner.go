@@ -12,7 +12,7 @@ func StartTasks(ctx context.Context, logger *zap.Logger, cfg *config.Config, rep
 	runner := NewTaskRunner(ctx, logger, 1)
 
 	// Регистрируем задачу
-	runner.RegisterTask("back_to_now_agreement", NewBackToNowAgreementTask(cfg, repositories))
+	runner.RegisterTask("back_to_now_agreement", NewBackToNowAgreementTask(cfg, repositories, true))
 
 	runner.Start()      // Запускаем воркеры
 	defer runner.Stop() // Гарантированно остановим
