@@ -18,6 +18,7 @@ func TestBtnaManyRequests(t *testing.T) {
 	type testCase struct {
 		name         string
 		ids          []string
+		staticProxy  bool
 		setupMock    func()
 		expectedErr  bool
 		expectedData []*model.AgreementParesedData
@@ -28,8 +29,9 @@ func TestBtnaManyRequests(t *testing.T) {
 
 	tests := []testCase{
 		{
-			name: "Success with one ID",
-			ids:  []string{"id1"},
+			name:        "Success with one ID",
+			ids:         []string{"id1"},
+			staticProxy: false,
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn wrappers.FuncInWrapp) (any, error) {
@@ -69,8 +71,49 @@ func TestBtnaManyRequests(t *testing.T) {
 			}},
 		},
 		{
-			name: "Fail to get proxy",
-			ids:  []string{"id1"},
+			name:        "Success with one ID static",
+			ids:         []string{"id1"},
+			staticProxy: true,
+			setupMock: func() {
+				call := 0
+				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn wrappers.FuncInWrapp) (any, error) {
+					call++
+					switch call {
+					case 1:
+						return []byte("web-page"), nil
+					case 2:
+						return &model.AgreementParesedData{
+							Pfid: "pfid1",
+							Customer: &model.Customer{
+								ID: "cust1",
+							},
+						}, nil
+					case 3:
+						return []byte("show-page"), nil
+					case 4:
+						return nil, nil
+					case 5:
+						return []byte("customer-page"), nil
+					case 6:
+						return nil, nil
+					default:
+						return nil, errors.New("unexpected call")
+					}
+				}
+			},
+			expectedErr: false,
+			expectedData: []*model.AgreementParesedData{{
+				ID:   "id1",
+				Pfid: "pfid1",
+				Customer: &model.Customer{
+					ID: "cust1",
+				},
+			}},
+		},
+		{
+			name:        "Fail to get proxy",
+			staticProxy: false,
+			ids:         []string{"id1"},
 			setupMock: func() {
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn wrappers.FuncInWrapp) (any, error) {
 					return nil, errors.New("proxy error")
@@ -80,8 +123,9 @@ func TestBtnaManyRequests(t *testing.T) {
 			expectedData: nil,
 		},
 		{
-			name: "Invalid type returned during parse",
-			ids:  []string{"id1"},
+			name:        "Invalid type returned during parse",
+			ids:         []string{"id1"},
+			staticProxy: false,
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn wrappers.FuncInWrapp) (any, error) {
@@ -120,7 +164,7 @@ func TestBtnaManyRequests(t *testing.T) {
 				UrlZakupkiAgreementGetCustomerWeb:        "cust/",
 			}
 
-			result, err := BtnaManyRequests(ctx, logger, cfg, tt.ids)
+			result, err := BtnaManyRequests(ctx, logger, cfg, tt.ids, tt.staticProxy)
 
 			if tt.expectedErr {
 				assert.Error(t, err)

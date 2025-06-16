@@ -20,6 +20,7 @@ import (
 type BackToNowAgreementTask struct {
 	cfg          *config.Config
 	repositories *repository.Repositories
+	staticProxy  bool
 }
 
 var funcWrapper = wrappers.FuncWrapper
@@ -30,8 +31,9 @@ var Now = func() time.Time {
 func NewBackToNowAgreementTask(
 	cfg *config.Config,
 	repositories *repository.Repositories,
+	staticProxy bool,
 ) *BackToNowAgreementTask {
-	return &BackToNowAgreementTask{cfg: cfg, repositories: repositories}
+	return &BackToNowAgreementTask{cfg: cfg, repositories: repositories, staticProxy: staticProxy}
 }
 
 func (t *BackToNowAgreementTask) Process(ctx context.Context, logger *zap.Logger) error {
@@ -64,19 +66,22 @@ outer:
 			if baseutils.DateOnly(Now()) == baseutils.DateOnly(varData.Vars.SignedAt) {
 				break outer
 			}
+			userAgentResponse := &model.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"}, Proxy: map[string]any{"url": nil}} // Если часто таймаут на серваке
 			urlProx := t.cfg.UrlGetProxy
 			// Получаем прокси
-			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, subtasks.NewGetRequest(urlProx))
-			if err != nil {
-				logger.Error("Get proxy error ", zap.Error(err))
-				mainErr = err
-				continue outer
-			}
-			userAgentResponse, ok := tmp.(*model.UserAgentResponse)
-			if !ok {
-				logger.Error("Parse error model.UserAgentResponse")
-				mainErr = errors.New("parse error model.UserAgentResponse")
-				break outer
+			if !t.staticProxy {
+				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, subtasks.NewGetRequest(urlProx))
+				if err != nil {
+					logger.Error("Get proxy error ", zap.Error(err))
+					mainErr = err
+					continue outer
+				}
+				userAgentResponse, ok = tmp.(*model.UserAgentResponse)
+				if !ok {
+					logger.Error("Parse error model.UserAgentResponse")
+					mainErr = errors.New("parse error model.UserAgentResponse")
+					break outer
+				}
 			}
 			urlNumbersPage := t.cfg.UrlZakupkiAgreementGetNumbersFirst +
 				dbDate +
@@ -129,7 +134,7 @@ outer:
 				continue outer
 			}
 			// Запускаем подзадачу, которая делает параллельные 50 запросов и парсит данные
-			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, subtasks.NewBtnaManyRequests(t.cfg, ids))
+			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, subtasks.NewBtnaManyRequests(t.cfg, ids, true))
 			if err != nil {
 				logger.Error("Error subtasks.NewBtnaManyRequests", zap.Error(err))
 				mainErr = err
