@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+
+    environment {
+        MONGO_USER = credentials('MONGO_USER')
+        MONGO_PASSWORD = credentials('MONGO_PASSWORD')
+        MONGO_HOST = "localhost"
+        MONGO_PORT = "27017"
+        URL_GET_PROXY = "http://83.222.25.147/api/v1/random-user"
+        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST = "https://zakupki.gov.ru/epz/contractfz223/search/results.html?morphology=on&search-filter=Дате+размещения&statuses_1=on&statuses_2=on&statuses_3=on&statuses=1,2,3&currencyId=-1&contract223DateFrom="
+        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND = "&contract223DateTo="
+        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD = "&sortBy=BY_UPDATE_DATE&pageNumber="
+        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH = "&sortDirection=true&recordsPerPage=_50&showLotsInfoHidden=false"
+        URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB = "https://zakupki.gov.ru/epz/contractfz223/card/contract-info.html?id="
+        URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML = "https://zakupki.gov.ru/223/contract/public/contract/print-form/show.html?pfid="
+        URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB = "https://zakupki.gov.ru/epz/organization/view223/info.html?agencyId="
+    }
+
+    tools { go '1.24.4' }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Prepare dependencies') {
+            steps {
+                sh 'go mod tidy'
+            }
+        }
+
+        stage('Setup .env file') {
+            steps {
+                writeFile(
+                    file: ".env.test",
+                    text: """
+                        MONGO_HOST=${MONGO_HOST}
+                        MONGO_PORT=${MONGO_PORT}
+                        URL_GET_PROXY=${URL_GET_PROXY}
+                        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST=${URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FIRST}
+                        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND=${URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_SECOND}
+                        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD=${URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_THIRD}
+                        URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH=${URL_ZAKUPKI_AGREEMENT_GET_NUMBERS_FORTH}
+                        URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB=${URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB}
+                        URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML=${URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML}
+                        URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB=${URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB}
+                    """
+                )
+            }
+        }
+
+        stage('Run tests') {
+            steps {
+                sh 'go test ./...'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "tests passed!"
+        }
+        failure {
+            echo "Tests failed!"
+        }
+    }
+}

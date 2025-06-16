@@ -1,0 +1,540 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE11"/>
+    <link rel="stylesheet" type="text/css" href="/223/contract/public/css/style.css" media="all"/>
+    <link href="/223/contract/public/images/icons/Portal.ico" rel="shortcut icon">
+    <link rel="stylesheet" type="text/css" href="/223/contract/public/css/msgBoxLight.css"/>
+    <link rel="stylesheet" type="text/css" href="/223/contract/public/css/jquery.msgbox.css"/>
+    <link rel="stylesheet" type="text/css" href="/223/contract/public/css/jquery-ui-1.8.13.custom.css"/>
+    <link type="text/css" rel="stylesheet" media="all" href="/223/contract/public/css/custom.css"/>
+
+    <script type="text/javascript" src="/223/contract/public/js/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="/223/contract/public/js/dsn.js"></script>
+    <script type="text/javascript" src="/223/contract/public/js/script.js"></script>
+    <script type="text/javascript" src="/223/contract/public/js/custom.js"></script>
+    <script type="text/javascript" src="/223/contract/public/js/jquery.msgBox.js"></script>
+    <script type="text/javascript" src="/223/contract/public/js/jquery-ui.min.js"></script>
+
+    <script src="/223/contract/public/js/jquery.ui.datepicker.js" type="text/javascript"></script>
+    <script src="/223/contract/public/js/jquery.ui.datepicker-ru.js" type="text/javascript"></script>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <script type="text/javascript" src="/223/contract/public/js/jsCollections.js"></script>
+
+    <script type="text/javascript" src="/223/contract/public/js/upload.js"></script>
+    <script type="text/javascript" src="/223/contract/public/js/upload_utils.js"></script>
+    <script type="text/javascript">
+        var commonConfig = {
+            contractPrivateHost :'https://lk.zakupki.gov.ru/223/contract/private',
+            purchasePrivateHost :'https://lk.zakupki.gov.ru/223/purchase/private',
+            planPrivateHost :'https://lk.zakupki.gov.ru/223/plan/private'
+        };
+    </script>
+
+</head>
+<body class="modalWindowBgColor">
+
+
+
+<script type="text/javascript" src="/223/contract/public/js/block.js"></script>
+
+<style type="text/css">
+    .opaqueLayer {
+        display: none;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        opacity: 0;
+        filter: alpha(opacity = 0);
+        background-color: #000000;
+        z-Index: 1000;
+    }
+
+    .greyOpaqueLayer {
+        display: none;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        opacity: 0.1;
+        filter: alpha(opacity = 10);
+        background-color: #000000;
+        z-Index: 1000;
+    }
+</style>
+
+<script type="text/javascript">
+    window.childPopup = null;
+    window.doNotLock = false;
+    window.onresize = setBlockPosition;
+    window.onscroll = correctLoaderPosition;
+</script>
+<div id="blockDiv"
+     class="opaqueLayer"
+     onclick="focusPopup();">
+</div>
+<div id="loaderDiv"
+     class="greyOpaqueLayer">
+</div>
+<table style="position: absolute;visibility: hidden;z-index: 2000; width: 160px; height: 39px; border: 1px solid #4878b2; background-color: #ffffff;"
+       id="loaderStatus">
+    <tr>
+        <td><img src="/223/contract/public/images/ajax-loader.gif" style="padding: 2px;"/></td>
+        <td id="loadingMsg" style="font-size: 20px; color: #2073b3; padding: 6px; white-space: nowrap;">
+        </td>
+    </tr>
+</table>
+
+
+<script type="text/javascript">
+
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter17353894 = new Ya.Metrika({id:17353894, enableAll: true, trackHash:true, ut:"noindex", webvisor:true});
+            } catch(e) { }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+                s = d.createElement("script"),
+                f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
+
+    var contextPath = '/223/contract/public';
+    if (window.opener) {
+        try{
+            var win = window.opener;
+            while (win.parent && win.parent != win) win = win.parent;
+            win.blockWindow(window);
+            win = null;
+            $(window).bind('beforeunload', function () {
+                try{
+                    if (window.opener) {
+                        var win = window.opener;
+                        while (win.parent && win.parent != win) win = win.parent;
+                        win.unBlockWindow();
+                        win = null;
+                    }
+                }catch(error){
+                    // if window open from other context - window.opener access denied, do nothing
+                }
+                return;
+            });
+        }catch(error){
+            // if window open from other context - window.opener access denied, do nothing
+        }
+    }
+
+
+    var contextPath = '/223/contract/public';
+    $(document).ready(function () {
+
+        //Календарь
+        if ($(".datepicker").size() != 0){
+            //date picker init
+            $(".datepicker").datepicker({
+                showOn:"button",
+                buttonImage:"/223/contract/public/images/calendar.png",
+                buttonImageOnly:true,
+                dateFormat:'dd.mm.yy',
+                buttonText:'Показать календарь',
+                regional:'ru',
+                onSelect: function(dateText, inst) {
+                    $(this).focus();
+                    $(this).change();
+                    return true;
+                }
+            });
+        }
+
+        //Disabling onClick listener on active tab
+        $("li.active").removeAttr('onclick');
+
+
+        if ($(".monthpicker").size() != 0){
+            //month picker init
+            $(".monthpicker").datepicker({
+                showOn:"button",
+                buttonImage:"/223/contract/public/images/calendar.png",
+                buttonImageOnly:true,
+                showButtonPanel: true,
+                currentText: "Текущий",
+                closeText: "Выбрать",
+                dateFormat:'mm.yy',
+                changeMonth: true,
+                changeYear: true,
+
+                buttonText:'Показать календарь',
+                regional:'ru',
+                onSelect: function(dateText, inst) {
+                    $(this).focus();
+                    $(this).change();
+                    return true;
+                },
+                onClose: function(dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).val($.datepicker.formatDate('mm.yy', new Date(year, month, 1)));
+                }
+            });
+
+            $(".monthpicker").focus(function () {
+                $(".ui-datepicker-calendar").hide();
+                $("#ui-datepicker-div").position({
+                    my: "center top",
+                    at: "center bottom",
+                    of: $(this)
+                });
+            });
+        }
+
+    })
+
+</script>
+
+    <noscript><div><img src="//mc.yandex.ru/watch/17353894?ut=noindex" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<div class="modal">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="/223/contract/public/js/crypto/crypto_6.15.js"></script>
+<script type="text/javascript" src="/223/contract/public/js/crypto-pro/cadesplugin_api_5.1.12.js"></script>
+<script type="text/javascript" src="/223/contract/public/js/crypto-pro/es6-promise.min.js"></script>
+<script type="text/javascript" src="/223/contract/public/js/crypto-pro/ie_eventlistner_polyfill.js"></script>
+
+
+<script type="text/javascript" src="/223/contract/public/js/block.js"></script>
+
+<style type="text/css">
+    .opaqueLayer {
+        display: none;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        opacity: 0;
+        filter: alpha(opacity = 0);
+        background-color: #000000;
+        z-Index: 1000;
+    }
+
+    .greyOpaqueLayer {
+        display: none;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        opacity: 0.1;
+        filter: alpha(opacity = 10);
+        background-color: #000000;
+        z-Index: 1000;
+    }
+</style>
+
+<script type="text/javascript">
+    window.childPopup = null;
+    window.doNotLock = false;
+    window.onresize = setBlockPosition;
+    window.onscroll = correctLoaderPosition;
+</script>
+<div id="blockDiv"
+     class="opaqueLayer"
+     onclick="focusPopup();">
+</div>
+<div id="loaderDiv"
+     class="greyOpaqueLayer">
+</div>
+<table style="position: absolute;visibility: hidden;z-index: 2000; width: 160px; height: 39px; border: 1px solid #4878b2; background-color: #ffffff;"
+       id="loaderStatus">
+    <tr>
+        <td><img src="/223/contract/public/images/ajax-loader.gif" style="padding: 2px;"/></td>
+        <td id="loadingMsg" style="font-size: 20px; color: #2073b3; padding: 6px; white-space: nowrap;">
+        </td>
+    </tr>
+</table>
+
+
+<script type="text/javascript" src="/223/contract/public/js/jquery.form.js"></script>
+
+<script type="text/javascript" src="/223/contract/public/assets/js/loader-urd.js"></script>
+<app-urd-root base-url="/223/contract/public"></app-urd-root>
+
+<link rel="stylesheet" href="/223/contract/public/css/jquery-ui.css" type="text/css" media="all" />
+<link rel="stylesheet" href="/223/contract/public/css/custom.css" type="text/css" media="all" />
+
+
+
+<style>
+    ul.pager span {
+        padding: 0px 3px !important;
+    }
+
+    ul.pager li {
+        margin: 3px 5px !important;
+    }
+</style>
+
+<script type="text/javascript">
+    setTimeout(function() {
+        urdInit('/223/contract/public');
+    }, 1000);
+
+    $(function() {
+        $( "#publicationTabs" ).tabs();
+
+
+        document.addEventListener('URD#on-authorization-error-attorney', function (event) {
+            console.log("on-authorization-error-attorney: ", event.detail);
+            // customAlert("Сведения недоступны для текущего пользователя", null, "Ошибка доступа");
+        }, false);
+    });
+
+    setCssModalMinWidth("500px");
+
+    function setCssModalMinWidth(newWidth) {
+        if($('.modal').size() == 0){ return; }
+        $('.modal').css("min-width", newWidth);
+    }
+</script>
+
+<script type="text/javascript" src="/223/contract/public/eis/js/script.js"></script>
+<script type="text/javascript" src="/223/contract/public/eis/js/keyboardControl.js"></script>
+
+<script type="text/javascript" src="/223/contract/public/js/jquery.cookie.js"></script>
+<script type="text/javascript">
+    function doUrdShowAttorney(poaGuid, entityWithAttorneyType, entityWithAttorneyId) {
+        let urdAddingData = {};
+        urdAddingData['entityType'] = entityWithAttorneyType;
+        urdAddingData['entityId'] = entityWithAttorneyId;
+
+        urdShowAttorney(poaGuid, urdAddingData);
+    }
+
+</script>
+
+<div class="printFormPopup" >
+    <div id="publicationTabs" style="border: none;width:100%">
+        <ul>
+            <li class="pfTab"><a href="#tabs-1">Печатная форма</a></li>
+
+
+
+        </ul>
+
+        <div id="tabs-1" style="height:100%; overflow: auto;">
+
+            <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:t="http://zakupki.gov.ru/223fz/types/1" xmlns:n1="http://zakupki.gov.ru/223fz/contract/1"><style type="text/css">
+                .title{
+                text-align: center;
+                font-size: 20px;
+                padding-top:20px;
+                font-weight: bold;
+                line-height: 1.5
+                }
+                .subTitle {
+                font-weight: bold;
+                text-align: center;
+                padding-bottom:20px;
+                }
+                .subItalicTitle {
+                font-style: italic;
+                text-align: center;
+                padding-bottom:20px;
+                }
+                .headerBlock {
+                font-weight: bold;
+                padding-top:20px;
+                }
+                table.item-information {
+                border-collapse: collapse;
+                }
+                table.item-information td{
+                padding: 2px;
+                border: 1px solid black;
+                }
+                table.item-information th{
+                padding: 2px;
+                border: 1px solid black;
+                }
+                .row {
+                vertical-align:top;
+                font-style: italic;
+                }
+                .emptySpace {
+                padding-top:10px;
+                }
+            </style><table><tr><td class="title" colspan="2">
+                        Информация о договоре о закупке товаров, работ, услуг №
+                        57705013033250003400000</td></tr><tr><td class="subTitle" colspan="2">
+                        Дата размещения сведений
+                        20.02.2025</td></tr><tr><td class="row">
+                        Номер договора:
+                    </td><td>КС-0081-25</td></tr><tr><td class="row">
+                        Дата заключения договора:
+                    </td><td>20.02.2025</td></tr><tr><td class="row">
+                                Позиция:
+                            </td><td>
+                                № 48
+                                &laquo;Осуществление закупок товаров с ценой договора не более 5 млн руб., работ, услуг с ценой договора не более 3 млн руб. (котировочная сессия).&raquo;
+                                плана закупки № 2240791540</td></tr><tr><td class="row">
+                        Способ закупки:
+                    </td><td>30000&nbsp;Закупка у единственного поставщика (подрядчика, исполнителя)</td></tr><tr><td class="row">
+                        Предмет договора:
+                    </td><td>Поставка инструмента аварийно-спасательного для нужд ГУП &laquo;Мосводосток&raquo;</td></tr><tr><td class="row">
+                        Цена договора:
+                    </td><td>1 396 498.94
+                        (Российский рубль)
+                    </td></tr><tr><td>Дата начала исполнения договора:</td><td>20.02.2025</td></tr><tr><td>
+                            Дата окончания исполнения договора:
+                        </td><td>31.08.2025</td></tr><tr><td class="headerBlock" colspan="2">
+                        Заказчик
+                    </td></tr><tr><td class="row">
+                        Идентификационный код заказчика:
+                    </td><td>57705013033770501001</td></tr><tr><td class="row" colspan="2">
+                            В отношении заказчика проводится оценка соответствия, в соответствии с пунктом 2 части 8.2 статьи 3 Федерального закона № 223-ФЗ
+                        </td></tr><tr><td class="row">
+                        Полное наименование организации:
+                    </td><td>ГОСУДАРСТВЕННОЕ УНИТАРНОЕ ПРЕДПРИЯТИЕ ГОРОДА МОСКВЫ ПО ЭКСПЛУАТАЦИИ МОСКОВСКИХ ВОДООТВОДЯЩИХ СИСТЕМ "МОСВОДОСТОК"</td></tr><tr><td class="row">
+                            Сокращенное наименование организации:
+                        </td><td>ГУП "МОСВОДОСТОК"</td></tr><tr><td class="row">
+                        ОКОПФ:
+                    </td><td>65242&nbsp;Государственные унитарные предприятия субъектов Российской Федерации</td></tr><tr><td class="row">
+                        ИНН/КПП:
+                    </td><td>7705013033 /
+                        770501001</td></tr><tr><td class="row">
+                        Дата постановки на учет в налоговом органе:
+                    </td><td>30.05.1995</td></tr><tr><td class="row">
+                        ОКПО:
+                    </td><td>16345267</td></tr><tr><td class="headerBlock" colspan="2">
+                        Основание для заключения договора
+                    </td></tr><tr><td colspan="2" class="row">
+                        Документы, подтверждающие основание заключения договора:
+                    </td></tr><tr><td colspan="2"><table class="item-information"><tr><th>Наименование документа</th><th>Наименование протокола закупки</th><th>Дата документа</th><th>Номер документа</th></tr><tr><td>Иной документ</td><td align="center">
+                                                &mdash;
+                                            </td><td align="center">19.12.2024</td><td align="center">
+                                                &mdash;
+                                            </td></tr></table></td></tr><tr></tr><tr><td class="headerBlock" colspan="2">
+                        Информация о товарах, работах, услугах
+                    </td></tr><tr><td colspan="2"><table class="item-information"><tr><th>№</th><th>Наименование товаров, работ, услуг</th><th>Классификация по ОКПД2</th><th>Количество (объем), единица измерения</th><th>Цена за единицу</th><th>Страна происхождения товара</th><th>Страна регистрации производителя товара</th><th>Объем финансового обеспечения</th></tr><tr><td align="center">1</td><td>Инструмент многофункциональный аварийно-спасательный<br><b>Тип объекта закупки:</b><br>Товар</td><td><b>ОКПД2:</b>28.24.12.190 Инструменты ручные прочие с механизированным приводом, не включенные в другие группировки</td><td align="center">1, Штука</td><td align="center">295 990.20, Российский рубль</td><td align="center">Российская Федерация</td><td align="center">
+                        &mdash;
+                    </td><td align="center">
+                        &mdash;
+                    </td></tr><tr><td align="center">2</td><td>Инструмент многофункциональный аварийно-спасательный<br><b>Тип объекта закупки:</b><br>Товар</td><td><b>ОКПД2:</b>28.24.12.190 Инструменты ручные прочие с механизированным приводом, не включенные в другие группировки</td><td align="center">1, Штука</td><td align="center">329 373.00, Российский рубль</td><td align="center">Российская Федерация</td><td align="center">
+                        &mdash;
+                    </td><td align="center">
+                        &mdash;
+                    </td></tr><tr><td align="center">3</td><td>Инструмент многофункциональный аварийно-спасательный<br><b>Тип объекта закупки:</b><br>Товар</td><td><b>ОКПД2:</b>28.24.12.190 Инструменты ручные прочие с механизированным приводом, не включенные в другие группировки</td><td align="center">1, Штука</td><td align="center">316 512.90, Российский рубль</td><td align="center">Российская Федерация</td><td align="center">
+                        &mdash;
+                    </td><td align="center">
+                        &mdash;
+                    </td></tr><tr><td align="center">4</td><td>Станок ручной для пожарных рукавов<br><b>Тип объекта закупки:</b><br>Товар</td><td><b>ОКПД2:</b>28.99.39.190 Оборудование специального назначения прочее, не включенное в другие группировки</td><td align="center">1, Комплект</td><td align="center">454 622.84, Российский рубль</td><td align="center">Российская Федерация</td><td align="center">
+                        &mdash;
+                    </td><td align="center">
+                        &mdash;
+                    </td></tr></table></td></tr><tr><td class="row">
+                        Итого за счет бюджетных средств:
+                    </td><td>0.00 российских рублей
+                    </td></tr></table></html>
+
+        </div>
+
+
+
+    </div>
+</div>
+</div>
+</body>
+</html>
