@@ -18,23 +18,57 @@ pipeline {
 
     tools { go '1.24.4' }
 
+    options {
+        skipStagesAfterUnstable() // Остановит pipeline, если условие ветки не выполнено
+    }
+
     stages {
+        stage('Validate branch') {
+            when {
+                expression {
+                    def target = env.CHANGE_TARGET ?: env.BRANCH_NAME
+                    return target == 'main' || target == 'dev'
+                }
+            }
+            steps {
+                echo "Pipeline triggered for branch or PR targeting '${env.CHANGE_TARGET ?: env.BRANCH_NAME}'"
+            }
+        }
+
         stage('Checkout') {
+            when {
+                expression {
+                    def target = env.CHANGE_TARGET ?: env.BRANCH_NAME
+                    return target == 'main' || target == 'dev'
+                }
+            }
             steps {
                 checkout scm
             }
         }
 
         stage('Prepare dependencies') {
+            when {
+                expression {
+                    def target = env.CHANGE_TARGET ?: env.BRANCH_NAME
+                    return target == 'main' || target == 'dev'
+                }
+            }
             steps {
                 sh 'go mod tidy'
             }
         }
 
         stage('Setup .env file') {
+            when {
+                expression {
+                    def target = env.CHANGE_TARGET ?: env.BRANCH_NAME
+                    return target == 'main' || target == 'dev'
+                }
+            }
             steps {
                 writeFile(
-                    file: ".env.test",
+                    file: "configs/.env.test",
                     text: """
                         MONGO_HOST=${MONGO_HOST}
                         MONGO_PORT=${MONGO_PORT}
@@ -52,6 +86,12 @@ pipeline {
         }
 
         stage('Run tests') {
+            when {
+                expression {
+                    def target = env.CHANGE_TARGET ?: env.BRANCH_NAME
+                    return target == 'main' || target == 'dev'
+                }
+            }
             steps {
                 sh 'go test ./...'
             }
@@ -60,10 +100,13 @@ pipeline {
 
     post {
         success {
-            echo "tests passed!"
+            echo "Tests passed!"
         }
         failure {
             echo "Tests failed!"
+        }
+        aborted {
+            echo "Pipeline aborted or skipped due to non-target branch."
         }
     }
 }

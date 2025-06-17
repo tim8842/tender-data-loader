@@ -41,7 +41,7 @@ func clearEnvVars(keys []string) {
 func TestLoadConfig_Successful(t *testing.T) {
 	envVars := setEnvVars()
 	defer clearEnvVars([]string{"MONGO_USER", "MONGO_PASSWORD", "MONGO_HOST", "MONGO_PORT", "URL_GET_PROXY"})
-	envPath, err := filepath.Abs("../../.env.test")
+	envPath, err := filepath.Abs("../../configs/.env.test")
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +62,7 @@ func TestLoadConfig_DefaultValues(t *testing.T) {
 	_ = setEnvVars()
 	clearEnvVars([]string{"MONGO_DB", "PORT"})
 	defer clearEnvVars([]string{"MONGO_USER", "MONGO_PASSWORD", "MONGO_HOST", "MONGO_PORT", "URL_GET_PROXY"})
-	envPath, err := filepath.Abs("../../.env.test")
+	envPath, err := filepath.Abs("../../configs/.env.test")
 	if err != nil {
 		panic(err)
 	}

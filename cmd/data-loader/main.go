@@ -10,10 +10,10 @@ import (
 	"github.com/tim8842/tender-data-loader/internal/config"
 	"github.com/tim8842/tender-data-loader/internal/customer"
 	"github.com/tim8842/tender-data-loader/internal/fiber"
-	"github.com/tim8842/tender-data-loader/internal/logger"
 	"github.com/tim8842/tender-data-loader/internal/task"
 	"github.com/tim8842/tender-data-loader/internal/variable"
 	"github.com/tim8842/tender-data-loader/pkg/db/mongo"
+	"github.com/tim8842/tender-data-loader/pkg/logger"
 	"github.com/tim8842/tender-data-loader/pkg/repository"
 	"go.uber.org/zap"
 )
@@ -38,7 +38,7 @@ func main() {
 	defer lgr.Sync()
 	lgr.Info("Логгер инициализирован")
 	// Загрузка конфига
-	envPath, err := filepath.Abs(".env")
+	envPath, err := filepath.Abs("configs/.env")
 	if err != nil {
 		panic(err)
 	}

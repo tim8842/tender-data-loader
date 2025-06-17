@@ -337,7 +337,7 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 	}
 	oldFuncWrapper := funcWrapper
 	oldNow := Now
-	envPath, err := filepath.Abs("../../.env.test")
+	envPath, err := filepath.Abs("../../configs/.env.test")
 	if err != nil {
 		panic(err)
 	}

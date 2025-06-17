@@ -16,7 +16,7 @@ import (
 func TestParseAgreementIds(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := zap.NewDevelopment()
-	dir := "../web/test/ParseAgreementIds"
+	dir := "../../assets/test/ParseAgreementIds"
 
 	tests := []struct {
 		name      string
@@ -62,7 +62,7 @@ func getDate(data string) time.Time {
 func TestParseAgreementFromMain(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := zap.NewDevelopment()
-	dir := "../web/test/ParseAgreementFromMain"
+	dir := "../../assets/test/ParseAgreementFromMain"
 	tests := []struct {
 		name         string
 		inputHTML    []byte
@@ -106,7 +106,7 @@ func TestParseAgreementFromMain(t *testing.T) {
 func TestParseAgreementFromHtml(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := zap.NewDevelopment()
-	dir := "../web/test/ParseAgreementFromHtml"
+	dir := "../../assets/test/ParseAgreementFromHtml"
 	tests := []struct {
 		name         string
 		inputHTML    []byte
@@ -265,7 +265,7 @@ func TestParseAgreementFromHtml(t *testing.T) {
 func TestParseCustomerFromMain(t *testing.T) {
 	ctx := context.Background()
 	logger, _ := zap.NewDevelopment()
-	dir := "../web/test/ParseCustomerFromMain"
+	dir := "../../assets/test/ParseCustomerFromMain"
 	tests := []struct {
 		name         string
 		inputHTML    []byte
