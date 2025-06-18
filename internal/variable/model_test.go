@@ -8,20 +8,20 @@ import (
 	"github.com/tim8842/tender-data-loader/internal/variable"
 )
 
-func TestVariableBackToNowAgreement_ConvertToVariable(t *testing.T) {
+func TestVariableBackToNow_ConvertToVariable(t *testing.T) {
 	now := time.Now().UTC().Truncate(time.Second)
 
 	tests := []struct {
 		name     string
-		input    variable.VariableBackToNowAgreement
+		input    variable.VariableBackToNow
 		wantErr  bool
 		expected variable.Variable
 	}{
 		{
 			name: "valid conversion",
-			input: variable.VariableBackToNowAgreement{
+			input: variable.VariableBackToNow{
 				ID: "abc123",
-				Vars: variable.VarsBackToNowAgreement{
+				Vars: variable.VarsBackToNow{
 					Page:     2,
 					SignedAt: now,
 				},
