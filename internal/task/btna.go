@@ -59,16 +59,16 @@ outer:
 			var err error
 			var tmpByte []byte
 			// Считываем данные для того чтобы хранить стейт в бд
-			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, variablet.NewGetVariableBackToNowAgreementById(t.varRepo, "back_to_now_agreement"))
+			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, variablet.NewGetVariableBackToNowById(t.varRepo, "back_to_now_agreement"))
 			if err != nil {
 				mainErr = err
 				continue outer
 			}
 
-			varData, ok := tmp.(*variable.VariableBackToNowAgreement)
+			varData, ok := tmp.(*variable.VariableBackToNow)
 			if !ok {
-				logger.Error("Parse error *model.VariableBackToNowAgreement")
-				mainErr = errors.New("parse error *model.VariableBackToNowAgreement")
+				logger.Error("Parse error *model.VariableBackToNow")
+				mainErr = errors.New("parse error *model.VariableBackToNow")
 				break outer
 			}
 			dbDate := parser.FromTimeToDate(varData.Vars.SignedAt)

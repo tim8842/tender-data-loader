@@ -33,7 +33,7 @@ type RetErr struct {
 func mockFuncWrapperFactory(results map[string]RetErr) func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
 	return func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
 		switch fn.(type) {
-		case *variablet.GetVariableBackToNowAgreementById:
+		case *variablet.GetVariableBackToNowById:
 			r := results["GetVariable"]
 			return r.Return, r.Err
 		case *uagentt.GetRequest:
@@ -78,8 +78,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "test endData",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date},
 				}, nil},
 				"GetProxy": {nil, nil},
 				"GetPage":  {"dsadas", nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -95,8 +95,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "Test err get proxy",
 			results: map[string]RetErr{
-				"GetVariable": {variable.VariableBackToNowAgreement{ID: "1",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date},
+				"GetVariable": {variable.VariableBackToNow{ID: "1",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date},
 				}, errors.New("")},
 				"GetProxy": {nil, nil},
 				"GetPage":  {"dsadas", nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -110,7 +110,7 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			mockVaU2Re:  nil,
 			mockCuRE:    nil,
 			staticProxy: false,
-			name:        "Bad parse type *variable.VariableBackToNowAgreement",
+			name:        "Bad parse type *variable.VariableBackToNow",
 			results: map[string]RetErr{
 				"GetVariable": {variable.Variable{ID: "1",
 					Vars: map[string]interface{}{"dasads": 3},
@@ -129,8 +129,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "test bad Get Proxy",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {nil, errors.New("")},
 				"GetPage":  {"dsadas", nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -146,8 +146,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "test bad Parse Proxy",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {1, nil},
 				"GetPage":  {"dsadas", nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -163,8 +163,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "test bad get Page",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {1, nil}, "ParseIDs": {[]string{"123", "32"}, errors.New("")},
@@ -180,8 +180,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "test bad type parse Page",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {1, nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -197,8 +197,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "err parse ids",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"32", "d32"}, errors.New("")},
@@ -214,8 +214,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "Bad parse type ids",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]int{32, 33}, nil},
@@ -231,8 +231,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			mockCuRE:    nil,
 			name:        "Bad update after ids",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "1",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "1",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{}, nil},
@@ -248,8 +248,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			staticProxy: false,
 			name:        "Bad many Requ",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
@@ -265,8 +265,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			mockCuRE:    nil,
 			name:        "Bad type Parse many request ",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
@@ -282,8 +282,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			mockCuRE:    nil,
 			name:        "Bad AgreementRepo.BulkMergeMany ",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
@@ -302,8 +302,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			mockCuRE:    errors.New(""),
 			name:        "Bad CustomerRepo.BulkMergeMany",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
@@ -322,8 +322,8 @@ func TestBackToNowAgreementTask_Process(t *testing.T) {
 			mockCuRE:    nil,
 			name:        "Bad VarRepo.Update2 ",
 			results: map[string]RetErr{
-				"GetVariable": {&variable.VariableBackToNowAgreement{ID: "back_to_now_agreement",
-					Vars: variable.VarsBackToNowAgreement{Page: 1, SignedAt: date2},
+				"GetVariable": {&variable.VariableBackToNow{ID: "back_to_now_agreement",
+					Vars: variable.VarsBackToNow{Page: 1, SignedAt: date2},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
