@@ -15,13 +15,13 @@ import (
 	"go.uber.org/zap/zaptest"
 )
 
-func TestGetVariableBackToNowAgreementById_Process(t *testing.T) {
+func TestGetVariableBackToNowById_Process(t *testing.T) {
 	date, _ := parser.ParseFromDateToTime("12.12.2024")
 	tests := []struct {
 		name      string
 		mockData  *variable.Variable
 		mockError error
-		expected  *variable.VariableBackToNowAgreement
+		expected  *variable.VariableBackToNow
 		expectErr bool
 	}{
 		{
@@ -31,9 +31,9 @@ func TestGetVariableBackToNowAgreementById_Process(t *testing.T) {
 				Vars: map[string]any{"page": 1, "signed_at": date},
 			},
 			mockError: nil,
-			expected: &variable.VariableBackToNowAgreement{
+			expected: &variable.VariableBackToNow{
 				ID: "back_to",
-				Vars: variable.VarsBackToNowAgreement{
+				Vars: variable.VarsBackToNow{
 					Page:     1,
 					SignedAt: date,
 				},
@@ -67,7 +67,7 @@ func TestGetVariableBackToNowAgreementById_Process(t *testing.T) {
 
 			mockRepo.On("GetByID", mock.Anything, "id123").Return(tt.mockData, tt.mockError)
 
-			task := task.NewGetVariableBackToNowAgreementById(mockRepo, "id123")
+			task := task.NewGetVariableBackToNowById(mockRepo, "id123")
 			result, err := task.Process(ctx, logger)
 
 			if tt.expectErr {
