@@ -22,6 +22,7 @@ type Config struct {
 	UrlZakupkiAgreementGetAgreegmentWeb      string
 	UrlZakupkiAgreementGetAgreegmentShowHtml string
 	UrlZakupkiAgreementGetCustomerWeb        string
+	UrlZakupkiContractGetNumbers             string
 }
 
 func LoadConfig(fileToEnv string) (*Config, error) {
@@ -45,6 +46,7 @@ func LoadConfig(fileToEnv string) (*Config, error) {
 		UrlZakupkiAgreementGetAgreegmentWeb:      os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB"),
 		UrlZakupkiAgreementGetAgreegmentShowHtml: os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML"),
 		UrlZakupkiAgreementGetCustomerWeb:        os.Getenv("URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB"),
+		UrlZakupkiContractGetNumbers:             os.Getenv("URL_ZAKUPKI_CONTRACT_GET_NUMBERS"),
 	}
 
 	required := map[string]string{
@@ -60,6 +62,7 @@ func LoadConfig(fileToEnv string) (*Config, error) {
 		"URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB":       cfg.UrlZakupkiAgreementGetAgreegmentWeb,
 		"URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML": cfg.UrlZakupkiAgreementGetAgreegmentShowHtml,
 		"URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB":         cfg.UrlZakupkiAgreementGetCustomerWeb,
+		"URL_ZAKUPKI_CONTRACT_GET_NUMBERS":               cfg.UrlZakupkiContractGetNumbers,
 	}
 
 	for key, val := range required {
