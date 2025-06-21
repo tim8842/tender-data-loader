@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/tim8842/tender-data-loader/internal/config"
@@ -60,15 +59,15 @@ outer:
 			var err error
 			var tmpByte []byte
 			// Считываем данные для того чтобы хранить стейт в бд
-			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, variablet.NewGetVariableBackToNowById(t.varRepo, "back_to_now_contract"))
+			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, variablet.NewGetVariableBackToNowById(t.varRepo, t.varId))
 			if err != nil {
 				mainErr = err
 				continue outer
 			}
 			varData, ok := tmp.(*variable.VariableBackToNowContract)
 			if !ok {
-				logger.Error("Parse error *model.VariableBackToNow")
-				mainErr = errors.New("parse error *model.VariableBackToNow")
+				logger.Error("Parse error *variable.VariableBackToNowContract")
+				mainErr = errors.New("parse error *variable.VariableBackToNowContract")
 				break outer
 			}
 			dbDate := parser.FromTimeToDate(varData.Vars.SignedAt)
@@ -123,43 +122,37 @@ outer:
 				mainErr = errors.New("parse error []string")
 				break outer
 			}
-			if len(ids) == 0 {
+			nextDate := func() uint8 {
 				varData.Vars.SignedAt = varData.Vars.SignedAt.Add(24 * time.Hour)
 				varData.Vars.Page = 1
 				vData, err := varData.ConvertToVariable()
 				if err != nil {
 					logger.Error("Error ConvertToVariable ", zap.Error(err))
 					mainErr = err
-					break outer
+					return 1
 				}
 				err = t.varRepo.Update(ctx, varData.ID, &vData)
 				if err != nil {
 					logger.Error("Update data SignedAt сontract error ", zap.Error(err))
 					mainErr = err
+					return 2
+				}
+				return 2
+			}
+			if len(ids) == 0 {
+				if nextDate() == 1 {
+					break outer
+				} else {
 					continue outer
 				}
-				continue outer
 			}
 			// Запускаем подзадачу, которая делает параллельные 50 запросов и парсит данные
 			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewBtnaManyRequests(t.cfg, ids, true))
 			if err != nil {
 				logger.Error("Error subtasks.NewBtnaManyRequests", zap.Error(err))
 				mainErr = err
-				if strings.Contains(err.Error(), "no correct data, empty") {
-					varData.Vars.SignedAt = varData.Vars.SignedAt.Add(24 * time.Hour)
-					varData.Vars.Page = 1
-					vData, err := varData.ConvertToVariable()
-					if err != nil {
-						logger.Error("Error ConvertToVariable ", zap.Error(err))
-						mainErr = err
-						break outer
-					}
-					err = t.varRepo.Update(ctx, varData.ID, &vData)
-					if err != nil {
-						logger.Error("Update data SignedAt сontract error ", zap.Error(err))
-						mainErr = err
-						continue outer
-					}
+				if nextDate() == 1 {
+					break outer
 				}
 				continue outer
 			}
