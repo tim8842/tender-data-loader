@@ -55,7 +55,7 @@ outer:
 			logger.Info("BackToNowContractTask: Context cancelled, exiting.")
 			return ctx.Err()
 		default:
-			time.Sleep(20 * time.Second)
+			// time.Sleep(20 * time.Second)
 			var tmp any
 			var ok bool
 			var err error

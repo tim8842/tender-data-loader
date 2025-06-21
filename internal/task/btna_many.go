@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -61,6 +62,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					// Получаем прокси
 					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetRequest(urlProx))
 					if err != nil {
+
 						mainErr = err
 						return
 					}
@@ -76,7 +78,9 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponse))
 				if err != nil {
 					logger.Error("Agreement web get err ", zap.Error(err))
-					mainErr = err
+					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
+						mainErr = err
+					}
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -116,7 +120,9 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponse))
 					if err != nil {
 						logger.Error("Agreement html show get err ", zap.Error(err))
-						mainErr = err
+						if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
+							mainErr = err
+						}
 						return
 					}
 					tmpByte, ok = tmp.([]byte)
@@ -155,7 +161,9 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWeb, userAgentResponse))
 				if err != nil {
 					logger.Error("Customer get err ", zap.Error(err))
-					mainErr = err
+					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
+						mainErr = err
+					}
 					return
 				}
 				tmpByte, ok = tmp.([]byte)

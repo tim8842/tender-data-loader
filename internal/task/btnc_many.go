@@ -79,7 +79,9 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err := funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponse))
 				if err != nil {
 					logger.Error("Contract web get err ", zap.Error(err))
-					mainErr = err
+					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
+						mainErr = err
+					}
 					return
 				}
 				tmpByte, ok := tmp.([]byte)
@@ -114,7 +116,9 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponse))
 				if err != nil {
 					logger.Error("Contract html show get err ", zap.Error(err))
-					mainErr = err
+					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
+						mainErr = err
+					}
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -140,7 +144,9 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWeb, userAgentResponse))
 				if err != nil {
 					logger.Error("Customer get err ", zap.Error(err))
-					mainErr = err
+					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
+						mainErr = err
+					}
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -166,7 +172,9 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWebAddInfo, userAgentResponse))
 				if err != nil {
 					logger.Error("Customer get err ", zap.Error(err))
-					mainErr = err
+					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
+						mainErr = err
+					}
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
