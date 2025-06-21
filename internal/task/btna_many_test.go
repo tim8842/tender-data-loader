@@ -26,7 +26,7 @@ func TestBtnaManyRequests(t *testing.T) {
 		expectedData []*agreement.AgreementParesedData
 	}
 
-	// Сохраняем оригинал, чтобы восстановить после тестов
+	// Сохраняем оригинал, чтобы восстановитьd после тестов
 	originalFuncWrapper := funcWrapper
 
 	tests := []testCase{
