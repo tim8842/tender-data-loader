@@ -5,41 +5,80 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-
 	inmock "github.com/tim8842/tender-data-loader/internal/mock"
 	"github.com/tim8842/tender-data-loader/internal/variable"
 	"go.uber.org/zap"
 )
 
-func TestCreateBase(t *testing.T) {
-
-	type testCase struct {
-		name        string
-		expectedErr bool
-	}
-	tests := []testCase{
+func TestCreateBaseVariables(t *testing.T) {
+	tests := []struct {
+		name           string
+		missingVarIDs  map[string]bool // какие ID должны отсутствовать (GetByID -> err)
+		createErrorFor string          // ID, при котором Create вернёт ошибку (если задан)
+		wantErr        bool
+	}{
 		{
-			name:        "Bad create back_to_now_agreement",
-			expectedErr: true,
+			name:          "Все переменные уже есть",
+			missingVarIDs: map[string]bool{},
+			wantErr:       false,
+		},
+		{
+			name:          "Одна переменная отсутствует, Create успешно",
+			missingVarIDs: map[string]bool{"back_to_now_contract100000": true},
+			wantErr:       false,
+		},
+		{
+			name:           "Одна переменная отсутствует, Create возвращает ошибку",
+			missingVarIDs:  map[string]bool{"back_to_now_contract999999999999": true},
+			createErrorFor: "back_to_now_contract999999999999",
+			wantErr:        true,
 		},
 	}
-	ctx := context.Background()
-	logger := zap.NewNop()
-	mockVarR := new(inmock.MockGenericRepository[*variable.Variable])
-	modVar := variable.Variable{ID: "back_to_now_agreement", Vars: map[string]any{"page": 1, "signed_at": "2011-02-02T00:00:00Z"}}
-	// Нужно дописать modvar для contract
+
 	for _, tt := range tests {
-		mockVarR.On("GetByID", mock.Anything, "back_to_now_agreement").Return(&variable.Variable{}, errors.New("")).Once()
-		mockVarR.On("Create", mock.Anything, &modVar).Return(errors.New("")).Once()
-		mockVarR.On("GetByID", mock.Anything, "back_to_now_contract").Return(&variable.Variable{}, errors.New("")).Once()
-		mockVarR.On("Create", mock.Anything, &modVar).Return(errors.New("")).Once()
-		res := variable.CreateBaseVariables(ctx, logger, mockVarR)
-		if tt.expectedErr {
-			assert.Error(t, res)
-		} else {
-			assert.NoError(t, res)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := new(inmock.MockGenericRepository[*variable.Variable])
+			logger := zap.NewNop()
+			ctx := context.TODO()
+
+			// Массив всех переменных, которые будут создаваться
+			baseVars := []variable.Variable{
+				{ID: "back_to_now_agreement"},
+				{ID: "back_to_now_contract40000"},
+				{ID: "back_to_now_contract100000"},
+				{ID: "back_to_now_contract300000"},
+				{ID: "back_to_now_contract600000"},
+				{ID: "back_to_now_contract10000000"},
+				{ID: "back_to_now_contract999999999999"},
+			}
+
+			for _, v := range baseVars {
+				if tt.missingVarIDs[v.ID] {
+					mockRepo.On("GetByID", mock.Anything, v.ID).Return((*variable.Variable)(nil), errors.New("not found"))
+
+					// Если Create должен вернуть ошибку — проверяем
+					if tt.createErrorFor == v.ID {
+						mockRepo.On("Create", mock.Anything, mock.MatchedBy(func(actual *variable.Variable) bool {
+							return actual.ID == v.ID
+						})).Return(errors.New("create failed")).Once()
+					} else {
+						mockRepo.On("Create", mock.Anything, mock.MatchedBy(func(actual *variable.Variable) bool {
+							return actual.ID == v.ID
+						})).Return(nil).Once()
+					}
+				} else {
+					mockRepo.On("GetByID", mock.Anything, v.ID).Return(&v, nil)
+				}
+			}
+
+			err := variable.CreateBaseVariables(ctx, logger, mockRepo)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreateBaseVariables() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			mockRepo.AssertExpectations(t)
+		})
 	}
 }

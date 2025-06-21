@@ -147,7 +147,7 @@ outer:
 				}
 			}
 			// Запускаем подзадачу, которая делает параллельные 50 запросов и парсит данные
-			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewBtnaManyRequests(t.cfg, ids, true))
+			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewSBtncManyReuests(t.cfg, ids, varData.Vars.Fz, true))
 			if err != nil {
 				logger.Error("Error subtasks.NewBtnaManyRequests", zap.Error(err))
 				mainErr = err
