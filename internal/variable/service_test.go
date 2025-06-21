@@ -28,9 +28,12 @@ func TestCreateBase(t *testing.T) {
 	ctx := context.Background()
 	logger := zap.NewNop()
 	mockVarR := new(inmock.MockGenericRepository[*variable.Variable])
-	modVar := variable.Variable{ID: "back_to_now_agreement", Vars: map[string]any{"page": 50, "signed_at": "2011-02-02T00:00:00Z"}}
+	modVar := variable.Variable{ID: "back_to_now_agreement", Vars: map[string]any{"page": 1, "signed_at": "2011-02-02T00:00:00Z"}}
+	// Нужно дописать modvar для contract
 	for _, tt := range tests {
 		mockVarR.On("GetByID", mock.Anything, "back_to_now_agreement").Return(&variable.Variable{}, errors.New("")).Once()
+		mockVarR.On("Create", mock.Anything, &modVar).Return(errors.New("")).Once()
+		mockVarR.On("GetByID", mock.Anything, "back_to_now_contract").Return(&variable.Variable{}, errors.New("")).Once()
 		mockVarR.On("Create", mock.Anything, &modVar).Return(errors.New("")).Once()
 		res := variable.CreateBaseVariables(ctx, logger, mockVarR)
 		if tt.expectedErr {

@@ -1,0 +1,836 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:common="http://zakupki.gov.ru/oos/common/1">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>Информация о контракте</title>
+      <style type="text/css">                    @media print {                                        @page {                    size : A4 portrait;                    orientation : A4 portrait;                    }                    @page body {                    zoom: 85%;                    widows: 10;                    }                    tr {                    page-break-inside: avoid;                    }                    div.inextricable {                    page-break-inside: avoid;                    }                    }                    body {                    font: normal 14px Tahoma, Geneva, sans-serif;                    }                    .printForm  {                    }                    .printForm .title{                    font-style: italic;                    }                    .printForm .aleft {                    text-align:left;                    }                    .printForm .bold{                    font-weight: bold;                    }                    .printForm .subtitle{                    text-decoration: underline;                    }                    .printForm .header{                    margin-top: 20px;                    margin-bottom: -10px;                    }                    .printForm .offset25{                    margin-left: 25px;                    }                    .printForm .offset50{                    margin-left: 50px;                    }                    .printForm table {                    width: 100%;                    border-collapse: collapse;                    margin: 0;                    text-align: left;                    }                    .printForm td  {                    text-align: justify;                    vertical-align: top;                    }                    .printForm .tableCol1  {                    padding:5px;                    width: 25%;                    padding-right: 30px;                    }                    .printForm .tableCol2 {                    padding:5px;                    width: 75%;                    }                    .printForm .tableCol1NotSet  {                    padding:5px;                    width: 80%;                    }                    .printForm .tableCol2NotSet {                    padding:5px;                    width: 20%;                    }                    .printForm .right {                    text-align: right;                    }                    .printForm .newPage{                    page-break-before: auto;                    }                    .printForm .col-border {                    border: 1px solid black;                    padding: 5px;                    height: 30px;                    }                    .printForm .col-border-without-top {                    border-left: 1px solid black;                    border-right: 1px solid black;                    border-bottom: 1px solid black;                    padding: 5px;                    height: 30px;                    }                    .printForm .contentHolder .right-pad {                    text-align: right;                    padding-right: 8px;                    }                    .printForm .data {                    padding: 0 2px 0 2px;                    border-bottom: 1px solid black;                    }                    .printForm .center {                    text-align: center;                    }                    .printForm .left {                    float: left;                    }                    .printForm .no-underline {                    border-bottom: 1px solid #FFFFFF;                    }                    .printForm .line p,data {                    border-bottom: 1px solid black;                    }                    .printForm .line {                    text-align: justify;                    min-height: 15px;                    }                    .printForm .line2 {                    text-align: justify;                    }                    .printForm .line2 p,data {                    border-bottom: 1px solid black;                    }                    .printForm .line.deliveryPlaceInfo {                    margin-bottom: 5px;                    }                    .printForm .line.deliveryPlaceInfo p {                    margin: 0;                    }                    .printForm .line.deliveryPlaceInfo .data {                    padding: 0;                    }                    .printForm .description {                    text-align: center;                    margin-top: -15px;                    }                    .printForm h1 {                    /*font: 15px Arial;*/                    font-weight: bold;                    }                    .printForm .border-table td {                    border: 1px solid black;                    padding: 5px;                    }                    .printForm .border-table td.no-border {                    border: 0;                    }                    .printForm .vert-space {                    height: 50px;                    }                    .printForm .bottom-pad {                    margin-bottom: 5px;                    }                    .printForm .border-table-head {                    }                    .printForm .border-table-head td {                    text-align: center !important;                    }                    .printForm .contentHolder{                    width:780px;                    }                    .printForm .contentHolder td  {                    text-align: center;                    vertical-align: middle;                    }                    .printForm .contractsTable{                    empty-cells:show;                    border-collapse: collapse;                    border: 1px solid black;                    word-wrap: break-word;                    width:4800px;                    table-layout:auto;                    padding: 0px;                    }                    .printForm .contractsTable .numbersLine td{                    border-bottom:0px;                    }                    .printForm .contractsTable .tdSub{                    padding:0px;                    padding-bottom: 0px;                    border-bottom:0px;                    border-top:0px;                    height:100%;                    }                    .printForm .contractsTableSub{                    word-wrap: break-word;                    table-layout:fixed;                    empty-cells:show;                    border-collapse: inherit;                    border: 0px;                    height:100%;                    padding: 0px;                    width:100%;                    }                    .printForm .contractsTableSub tr td{                    word-wrap: break-word;                    border: 0px;                    }                    .printForm .contractsTitle{                    border-collapse: collapse;                    border: 0px;                    text-align:center;                    width:100%;                    }                    .printForm .contractsTableHeader td, .printForm .border-table-head td{                    border-collapse: collapse;                    border: 1px solid black;                    font-weight: normal;                    text-align:center;                    vertical-align:middle;                    }                    .printForm .contractsTable td{                    border-collapse: collapse;                    border: 1px solid black;                    text-align:center;                    padding:2px;                    }                    .printForm .budgetSourceCell{                    text-align:left;                    width:auto;                    }                    .printForm .budgetYearsTitle td{                    text-align:left;                    width:60px;                    }                    .printForm .offBudgetSourceCell{                    text-align:left;                    width:auto;                    }                    .printForm .offBudgetYearsTitle td{                    text-align:left;                    width:78px;                    }                    .printForm .contractsTableSub .pfcolBR{                    width:150px;                    border-right:1px solid black;                    border-top:1px solid black;                    }                    .printForm .contractsTableSub .pfcolB{                    width:150px;                    border-top:1px solid black;                    }                    .printForm .contractsTableSub .pfcolB300{                    width:300px;                    border-top:1px solid black;                    }                    .printForm .nowrap {                    white-space: nowrap;                    }                    .printForm .contract-cell-content td {                    text-align:left;                    }                    .printForm .accountDetails td {                    text-align: left;                    vertical-align: top;                    }                    table.pad10 tr td { padding: 10px !important; }                    p.m2 {margin: 2px;}                    p.m15 {margin: 15px 0px;}                </style>
+   </head>
+   <body onload="focus();">
+      <div class="printForm">
+         <div class="contentHolder">
+            <center>                            Информация о заключенном контракте (его изменении)
+               </center><br><table cellpadding="0" cellspacing="0">
+               <tr>
+                  <td>
+                     <div class="center">от                                                    "            <span class="data">21</span>            "            <span class="data">Января</span>            &nbsp;20            <span class="data">25</span>            г.        </div>
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">Наименование заказчика&nbsp;                    <span class="data">ФЕДЕРАЛЬНОЕ КАЗЕННОЕ УЧРЕЖДЕНИЕ ЗДРАВООХРАНЕНИЯ "МЕДИКО-САНИТАРНАЯ ЧАСТЬ № 59 ФЕДЕРАЛЬНОЙ
+                                 СЛУЖБЫ ИСПОЛНЕНИЯ НАКАЗАНИЙ"                (ФКУЗ МСЧ-59 ФСИН РОССИИ)                                    &nbsp;                    </span></span></p>
+                     </div>
+                     <div class="line underline">
+                        <p><span class="no-underline">Тип информации&nbsp;                    <span class="data">первичная                        &nbsp;                    </span></span></p>
+                        <table class="description">
+                           <tr>
+                              <td><span>(первичная, измененная)&nbsp;                        </span></td>
+                           </tr>
+                        </table>
+                     </div>
+                  </td>
+                  <td width="25%">
+                     <table cellpadding="0" cellspacing="0">
+                        <tr>
+                           <td class="right-pad"></td>
+                           <td class="col-border" width="110px">Коды</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Форма по ОКУД</td>
+                           <td class="col-border" width="110px"></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Дата</td>
+                           <td class="col-border" width="110px">21.01.2025</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">ИНН</td>
+                           <td class="col-border" width="110px">2464033793</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">КПП</td>
+                           <td class="col-border" width="110px">590501001</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Код ОПФ</td>
+                           <td class="col-border" width="110px">75104</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Код ОКПО</td>
+                           <td class="col-border" width="110px">08922130</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">ИКУ</td>
+                           <td class="col-border" width="110px">12464033793590501001</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+            </table>
+            <div class="vert-space"></div>
+            <table style="border-collapse:collapse;">
+               <tr>
+                  <td style="vertical-align: bottom;" width="70%">
+                     <div class="underline" style="text-align:left;">
+                        <p><span class="no-underline">Источник финансирования контракта:&nbsp;                    <span>                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td class="right-pad" style="padding-left: 10px" width="10%">                                    Код территории муниципального образования
+                     </td>
+                  <td class="col-border" width="20%">
+                     <div style="text-align:center;">
+                        <p class="m2"><span class="no-underline">&nbsp;                    <span style="width:110px">57701000                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+               </tr>
+               <tr>
+                  <td width="70%">
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">наименование бюджета&nbsp;                    <span class="data">Федеральный бюджет                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td width="10%"></td>
+                  <td class="col-border" width="20%">
+                     <div style="text-align:center;">
+                        <p class="m2"><span class="no-underline">&nbsp;                    <span style="width:110px">10                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+               </tr>
+               <tr>
+                  <td width="70%">
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">наименование внебюджетных средств&nbsp;                    <span class="data">                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td width="10%"></td>
+                  <td class="col-border" width="20%">
+                     <div style="text-align:center;">
+                        <p class="m2"><span class="no-underline">&nbsp;                    <span style="width:110px">                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+               </tr>
+               <tr>
+                  <td width="70%">
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">Способ определения поставщика (подрядчика, исполнителя)&nbsp;                    <span class="data">                                    закупка у единственного поставщика (подрядчика,
+                                 исполнителя). Пункт 28 части 1 статьи 93 Закона № 44-ФЗ. Закупка лекарственных препаратов,
+                                 которые предназначены для назначения пациенту при наличии медицинских показаний (индивидуальная
+                                 непереносимость, по жизненным показаниям) по решению врачебной комиссии, которое отражается
+                                 в медицинских документах пациента и журнале врачебной комиссии                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td width="10%"></td>
+                  <td class="col-border" width="20%">
+                     <div style="text-align:center;">
+                        <p class="m2"><span class="no-underline">&nbsp;                    <span style="width:110px">20310                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+               </tr>
+               <tr>
+                  <td width="70%">
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">Тип изменения&nbsp;                    <span class="data">                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td width="10%"></td>
+                  <td class="col-border" width="20%">
+                     <div style="text-align:center;">
+                        <p class="m2"><span class="no-underline">&nbsp;                    <span style="width:110px">                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+               </tr>
+               <tr>
+                  <td width="70%">
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">Причина изменения условий контракта&nbsp;                    <span class="data">                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td width="10%"></td>
+                  <td class="col-border" width="20%">
+                     <div style="text-align:center;">
+                        <p class="m2"><span class="no-underline">&nbsp;                    <span style="width:110px">                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+               </tr>
+               <tr>
+                  <td width="70%">
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">Реквизиты документа, подтверждающего основание изменения условий контракта&nbsp;                    <span class="data">&nbsp;                                                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td width="10%"></td>
+                  <td class="col-border" width="20%">
+                     <div style="text-align:center;">
+                        <p class="m2"><span class="no-underline">&nbsp;                    <span style="width:110px">                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+               </tr>
+               <tr>
+                  <td width="70%">
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">Дата подведения результатов определения поставщика (подрядчика, исполнителя)&nbsp;                    <span class="data">&nbsp;                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td width="10%"></td>
+                  <td class="col-border" width="20%"></td>
+               </tr>
+               <tr>
+                  <td width="70%">
+                     <div class="line underline">
+                        <p class="m2"><span class="no-underline">Реквизиты документа, подтверждающего основание заключения контракта&nbsp;                    <span class="data"> п.28 ч.1 ст.93 Федерального закона №44-ФЗ, Протокол от 10.01.2025 №207                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+                  <td width="10%"></td>
+                  <td class="col-border" width="20%">
+                     <div style="text-align:center;">
+                        <p class="m2"><span class="no-underline">&nbsp;                    <span style="width:110px">                        &nbsp;                    </span></span></p>
+                     </div>
+                  </td>
+               </tr>
+            </table>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">Предмет контракта&nbsp;                    <span class="data">Поставка лекарственных препаратов для медицинского применения                        &nbsp;                    </span></span></p>
+            </div>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">Предмет контракта относится к работам по строительству&nbsp;                    <span class="data">Нет                        &nbsp;                    </span></span></p>
+            </div>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">Контракт заключен в соответствии с частью 16 статьи 34 Федерального закона 44-ФЗ (контракт
+                     жизненного цикла)&nbsp;                    <span class="data">Нет                        &nbsp;                    </span></span></p>
+            </div>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">Способ указания цены контракта&nbsp;                    <span class="data">цена контракта                        &nbsp;                    </span></span></p>
+            </div>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">Формула цены контракта&nbsp;                    <span class="data">                        &nbsp;                    </span></span></p>
+            </div>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">В условиях контракта указана максимальная цена контракта и формула цены контракта&nbsp;                    <span class="data">Нет                        &nbsp;                    </span></span></p>
+            </div>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">Информация о банковском и (или) казначейском сопровождении контракта&nbsp;                    <span class="data">Банковское или казначейское сопровождение контракта не требуется<br></span></span></p>
+            </div>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">Контрактом предусмотрена возможность одностороннего отказа от исполнения контракта
+                     в соответствии со ст. 95 Закона 44-ФЗ &nbsp;                    <span class="data">Да                        &nbsp;                    </span></span></p>
+            </div>
+            <div class="line underline">
+               <p class="m15"><span class="no-underline">Контрактом предусмотрено удержание суммы неисполненных требований об уплате неустоек
+                     (штрафов, пеней) из суммы, подлежащей оплате поставщику (подрядчику, исполнителю)&nbsp;                    <span class="data">                                        Да                                                            &nbsp;                    </span></span></p>
+            </div>
+            <div class="vert-space"></div>
+            <table cellpadding="0" cellspacing="0" class="pad10" style="width: 88%">
+               <tr>
+                  <td style="vertical-align: unset;" width="50%">
+                     <table cellpadding="0" cellspacing="0">
+                        <tr>
+                           <td class="right-pad">Дата заключения контракта</td>
+                           <td class="col-border ">15.01.2025</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Цена контракта в иностранной валюте</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Цена контракта в рублях</td>
+                           <td class="col-border ">7 274.52</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Цена за право заключения контракта в иностранной валюте</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">НДС в иностранной валюте</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Размер аванса в иностранной валюте</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Размер аванса в рублях</td>
+                           <td class="col-border ">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Дата начала исполнения контракта</td>
+                           <td class="col-border ">15.01.2025</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Объем привлечения к исполнению контракта субподрядчиков, соисполнителей из числа СМП, СОНО в %</td>
+                           <td class="col-border ">&nbsp;</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="vertical-align: unset;">
+                     <table cellpadding="0" cellspacing="0">
+                        <tr>
+                           <td class="right-pad">Номер контракта</td>
+                           <td class="col-border ">3</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Код валюты по ОКВ</td>
+                           <td class="col-border ">RUB</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Курс иностранной валюты по отношению к рублю</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Цена за право заключения контракта в рублях</td>
+                           <td class="col-border ">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">НДС в рублях</td>
+                           <td class="col-border ">661.32</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Размер аванса в процентах от цены контракта</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Суммы, уплачиваемые                                                  заказчиком поставщику (подрядчику, исполнителю),                                                  будут уменьшены на размер налогов, сборов и иных обязательных платежей</td>
+                           <td class="col-border ">Нет</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Дата окончания исполнения контракта</td>
+                           <td class="col-border ">19.12.2025</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Объем привлечения к исполнению контракта субподрядчиков, соисполнителей из числа СМП, СОНО в рублях</td>
+                           <td class="col-border ">&nbsp;</td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+            </table>
+            <div class="vert-space"></div>
+            <table cellpadding="0" cellspacing="0" style="width: 88%">
+               <tr>
+                  <td>
+                     <table cellpadding="0" cellspacing="0">
+                        <tr>
+                           <th></th>
+                           <th width="170px"></th>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Идентификатор этапа контракта</td>
+                           <td class="col-border title">113939749</td>
+                        </tr>
+                        <tr class="vert-space"></tr>
+                        <tr>
+                           <td class="right-pad">Номер извещения об осуществлении закупки<br/>(приглашения принять участие в закупке)</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Уникальный номер позиции плана-графика закупок</td>
+                           <td class="col-border ">202503561000027001000021</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Идентификационный код закупки</td>
+                           <td class="col-border ">251246403379359050100100080052120244</td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Идентификатор контракта, заключенного в электронной форме</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Номер реестровой записи</td>
+                           <td class="col-border "></td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+            </table><br><table cellpadding="0" cellspacing="0" style="width: 88%">
+               <tr>
+                  <td>
+                     <center class="bottom-pad">Информация об обеспечении исполнения контракта</center>
+                     <table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+                        <tr class="border-table-head">
+                           <td style="width:33%"></td>
+                           <td style="width:33%">Размер обеспечения исполнения контракта</td>
+                        </tr>
+                        <tr>
+                           <td style="text-align: center;">1</td>
+                           <td style="text-align: center;">2</td>
+                        </tr>
+                        <tr>
+                           <td>Обеспечение исполнения контракта</td>
+                           <td></td>
+                        </tr>
+                        <tr>
+                           <td>Обеспечение исполнения контракта по поставке товара или выполнению работы</td>
+                           <td></td>
+                        </tr>
+                        <tr>
+                           <td>Обеспечение исполнения контракта по последующему обслуживанию, эксплуатации (при наличии)
+                              в течение срока службы, ремонту и (или) утилизации поставленного товара или созданного
+                              в результате выполнения работы объекта капитального строительства или товара</td>
+                           <td></td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+            </table><br><table cellpadding="0" cellspacing="0" style="width: 88%">
+               <tr>
+                  <td>
+                     <table>
+                        <tr>
+                           <th></th>
+                           <th width="247px"></th>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Срок, на который предоставляется гарантия</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Информация о требованиях к гарантийному обслуживанию товара</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Требования к гарантии производителя товара</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Требуется обеспечение исполнения обязательств по предоставленной гарантии качества товаров, работ, услуг</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Размер обеспечения исполнения обязательств по предоставленной гарантии качества товаров, работ, услуг в рублях</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Код валюты обеспечения исполнения обязательств по предоставленной гарантии качества товаров, работ, услуг по ОКВ</td>
+                           <td class="col-border "></td>
+                        </tr>
+                        <tr>
+                           <td class="right-pad">Размер обеспечения исполнения обязательств по предоставленной гарантии качества товаров, работ, услуг в иностранной валюте</td>
+                           <td class="col-border "></td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+            </table>
+            <div class="vert-space"></div>
+            <div class="vert-space"></div>
+            <div class="vert-space"></div>
+            <div class="vert-space"></div>
+            <div class="line underline">
+               <p class="m2"><span class="no-underline">Информация об экономии в натуральном выражении соответствующих расходов заказчика
+                     на поставки энергетических ресурсов при заключении энергосервисного контракта&nbsp;                    <span class="data">                        &nbsp;                    </span></span></p>
+            </div><span class="m2">Место поставки товара, выполнения работы или оказания услуги</span><br><div class="line underline deliveryPlaceInfo">
+               <p><span class="data">Российская Федерация, край Пермский, г.о. Пермский, г Пермь, ул Василия Васильева,
+                     дом 27, аптечный склад ОМСМТиИО ФКУЗ МСЧ-59 ФСИН России, 2 этаж</span></p>
+            </div>
+            <div class="vert-space"></div>
+            <div class="newPage"></div>
+            <div class="inextricable">
+               <center class="bottom-pad">Раздел I. График финансирования</center><br><table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+                  <tr class="border-table-head">
+                     <td rowspan="2" width="17%">Код бюджетной классификации Российской Федерации</td>
+                     <td rowspan="2">Код объекта капитального строительства/ недвижимого имущества</td>
+                     <td colspan="10">                                                    Сумма контракта (в валюте контракта)
+                        </td>
+                  </tr>
+                  <tr class="border-table-head">
+                     <td>на&nbsp;                                                2025                                                &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                     <td style="text-align:left;">                                                    на&nbsp;
+                        20__                                                    &nbsp;год
+                        </td>
+                  </tr>
+                  <tr>
+                     <td style="text-align:left;">1</td>
+                     <td style="text-align:left;">2</td>
+                     <td style="text-align:left;">3</td>
+                     <td style="text-align:left;">4</td>
+                     <td style="text-align:left;">5</td>
+                     <td style="text-align:left;">6</td>
+                     <td style="text-align:left;">7</td>
+                     <td style="text-align:left;">8</td>
+                     <td style="text-align:left;">9</td>
+                     <td style="text-align:left;">10</td>
+                     <td style="text-align:left;">11</td>
+                     <td style="text-align:left;">12</td>
+                  </tr>
+                  <tr>
+                     <td>32009014240690059244</td>
+                     <td></td>
+                     <td class="budgetSourceCell">7 274.52</td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                  </tr>
+                  <tr>
+                     <td class="right-pad no-border"></td>
+                     <td class="right-pad no-border">Итого</td>
+                     <td class="budgetSourceCell nowrap">7 274.52</td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                     <td style="text-align:left;">                    &nbsp;                </td>
+                  </tr>
+               </table><br><br><div class="vert-space"></div>
+            </div>
+            <div class="inextricable">
+               <center class="bottom-pad">Раздел II. Объект закупки</center>
+               <table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+                  <tr class="border-table-head">
+                     <td>№<br>п/п</td>
+                     <td>Наименование объекта закупки</td>
+                     <td>Тип объекта закупки</td>
+                     <td>Позиции по<br>КТРУ,<br>ОКПД2,<br>информация о ТРУ</td>
+                     <td>Количество <br>(объем) и <br>единица <br>измерения <br>по ОКЕИ</td>
+                     <td>Характеристики<br>объекта<br>закупки</td>
+                     <td>Цена за единицу (в валюте контракта)</td>
+                     <td>Ставка<br>НДС</td>
+                     <td>Страна<br>происхождения<br>товара</td>
+                     <td>Сумма (в валюте контракта)</td>
+                  </tr>
+                  <td style="text-align:left;">1</td>
+                  <td style="text-align:left;">2</td>
+                  <td style="text-align:left;">3</td>
+                  <td style="text-align:left;">4</td>
+                  <td style="text-align:left;">5</td>
+                  <td style="text-align:left;">6</td>
+                  <td style="text-align:left;">7</td>
+                  <td style="text-align:left;">8</td>
+                  <td style="text-align:left;">9</td>
+                  <td style="text-align:left;">10</td>
+                  <tr>
+                     <td>1</td>
+                     <td>Ворикоз</td>
+                     <td>                                                    Товар
+                        </td>
+                     <td>Препараты противогрибковые для системного использования                                                    (21.20.10.192)                                                </td>
+                     <td>14&nbsp;                                                                    Штука                                                                    (шт)                                                                                                                                            (таблетка)                                                                    </td>
+                     <td></td>
+                     <td>519.608571428</td>
+                     <td>10%</td>
+                     <td>Республика Индия                                                                            (356)                                                                        </td>
+                     <td>7 274.52</td>
+                  </tr>
+                  <tr>
+                     <td class="right-pad no-border" colspan="9">Итого</td>
+                     <td style="width:100px">7 274.52</td>
+                  </tr>
+               </table>
+            </div>
+            <center class="bottom-pad">Дополнительная информация о лекарственном препарате</center>
+            <table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+               <tr class="border-table-head">
+                  <td>№<br>п/п</td>
+                  <td>№ п/п<br>объекта<br>закупки</td>
+                  <td>Международное<br>непатентованное или<br>группировочное или<br>химическое наименование</td>
+                  <td>Торговое<br>наименование</td>
+                  <td>Лекарственная<br>форма</td>
+                  <td>Дозировка</td>
+                  <td>МНН и форма выпуска в<br>соответствии с ГРЛС</td>
+                  <td>Количество<br>(в потребительских<br>единицах<br> измерения)</td>
+               </tr>
+               <tr>
+                  <td style="text-align:left;">1</td>
+                  <td style="text-align:left;">2</td>
+                  <td style="text-align:left;">3</td>
+                  <td style="text-align:left;">4</td>
+                  <td style="text-align:left;">5</td>
+                  <td style="text-align:left;">6</td>
+                  <td style="text-align:left;">7</td>
+                  <td style="text-align:left;">8</td>
+               </tr>
+               <tr>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>ВОРИКОНАЗОЛ</td>
+                  <td>Ворикоз</td>
+                  <td>ТАБЛЕТКИ, ПОКРЫТЫЕ ОБОЛОЧКОЙ</td>
+                  <td>200<br>мг</td>
+                  <td>ВОРИКОНАЗОЛ:ТАБЛЕТКИ ПОКРЫТЫЕ ПЛЕНОЧНОЙ ОБОЛОЧКОЙ, 200 мг</td>
+                  <td>14</td>
+               </tr>
+            </table><br><table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+               <tr class="border-table-head">
+                  <td>№<br>п/п</td>
+                  <td>№ п/п<br>объекта<br>закупки</td>
+                  <td>Номер РУ</td>
+                  <td>Наименование держателя<br>или владельца РУ</td>
+                  <td>Наименование<br>производителя</td>
+                  <td>Наименование страны<br>производителя, код по ОКСМ</td>
+               </tr>
+               <tr>
+                  <td style="text-align:left;">1</td>
+                  <td style="text-align:left;">2</td>
+                  <td style="text-align:left;">9</td>
+                  <td style="text-align:left;">10</td>
+                  <td style="text-align:left;">11</td>
+                  <td style="text-align:left;">12</td>
+               </tr>
+               <tr>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>ЛП-003577</td>
+                  <td>ХАЙГЛАНС ЛАБОРАТОРИС ПВТ. ЛТД.</td>
+                  <td>ХАЙГЛАНС ЛАБОРАТОРИС ПВТ. ЛТД.</td>
+                  <td>Республика Индия(356)                                                            </td>
+               </tr>
+            </table><br><table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+               <tr class="border-table-head">
+                  <td>№<br>п/п</td>
+                  <td>№ п/п<br>объекта<br>закупки</td>
+                  <td>Вид первичной<br>упаковки</td>
+                  <td>Количество<br>лекарственных<br>форм в<br>первичной<br>упаковке</td>
+                  <td>Количество<br>первичных<br>упаковок в<br>потребительской<br>упаковке</td>
+                  <td>Количество<br>потребительских<br>единиц в<br>потребительской<br>упаковке</td>
+                  <td>Комплектность<br>потребительской<br>упаковки</td>
+               </tr>
+               <tr>
+                  <td style="text-align:left;">1</td>
+                  <td style="text-align:left;">2</td>
+                  <td style="text-align:left;">13</td>
+                  <td style="text-align:left;">14</td>
+                  <td style="text-align:left;">15</td>
+                  <td style="text-align:left;">16</td>
+                  <td style="text-align:left;">17</td>
+               </tr>
+               <tr>
+                  <td>1</td>
+                  <td>1</td>
+                  <td>БЛИСТЕР</td>
+                  <td>7</td>
+                  <td>1</td>
+                  <td>7</td>
+                  <td>~</td>
+               </tr>
+            </table>
+            <div class="line underline">
+               <p class="m2"><span class="no-underline">Сведения об изменении информации об объекте закупки&nbsp;                    <span class="data">                        &nbsp;                    </span></span></p>
+            </div>
+            <div class="vert-space"></div>
+            <center class="bottom-pad">Реквизиты документов, подтверждающих согласование поставщиком и
+               заказчиком изменения объекта закупки                        </center>
+            <table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+               <tr class="border-table-head">
+                  <td>Дата</td>
+                  <td>Номер документа</td>
+               </tr>
+               <td style="text-align:left;">1</td>
+               <td style="text-align:left;">2</td>
+            </table>
+            <div class="vert-space"></div>
+            <div class="inextricable land">
+               <center class="bottom-pad">Раздел III. Информация о поставщиках (подрядчиках, исполнителях) по
+                  контракту                            </center>
+               <table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+                  <tr class="border-table-head">
+                     <td rowspan="2">№<br>п/п</td>
+                     <td rowspan="2">Наименование юридического лица<br>(Ф.И.О. физического лица)</td>
+                     <td rowspan="2">Наименование страны, код по ОКСМ</td>
+                     <td rowspan="2">Адрес места нахождения (места жительства)</td>
+                     <td rowspan="2">Почтовый адрес</td>
+                     <td rowspan="2">ИНН</td>
+                     <td rowspan="2">КПП</td>
+                     <td rowspan="2">Статус</td>
+                     <td rowspan="2">Телефон (электронная почта)</td>
+                  </tr>
+                  <tr></tr>
+                  <tr>
+                     <td style="text-align:left;">1</td>
+                     <td style="text-align:left;">2</td>
+                     <td style="text-align:left;">3</td>
+                     <td style="text-align:left;">4</td>
+                     <td style="text-align:left;">5</td>
+                     <td style="text-align:left;">6</td>
+                     <td style="text-align:left;">7</td>
+                     <td style="text-align:left;">8</td>
+                     <td style="text-align:left;">9</td>
+                  </tr>
+                  <tr>
+                     <td>1</td>
+                     <td>АКЦИОНЕРНОЕ ОБЩЕСТВО "ЦЕНТР ВНЕДРЕНИЯ "ПРОТЕК". АО ЦВ ПРОТЕК</td>
+                     <td>Российская Федерация 643</td>
+                     <td>115201, Г.МОСКВА 77, Ш КАШИРСКОЕ, Д. 22, К. 4</td>
+                     <td>115201, Г.МОСКВА 77, Ш КАШИРСКОЕ, Д. 22, К. 4</td>
+                     <td>7724053916</td>
+                     <td>772401001</td>
+                     <td>субъект малого                                                    предпринимательства
+                        </td>
+                     <td>7-342-2700370<br>a_moiseeva@perm.protek.ru</td>
+                  </tr>
+                  <tr>
+                     <td>2</td>
+                     <td>Филиал АКЦИОНЕРНОГО ОБЩЕСТВА "ЦЕНТР ВНЕДРЕНИЯ "ПРОТЕК" "ПРОТЕК-10". Филиал АО  "ЦВ "ПРОТЕК" "ПРОТЕК-10"<br><br><i style="font-size: 10px;">Является обособленным подразделением юридического лица</i></td>
+                     <td>Российская Федерация 643</td>
+                     <td>420054, РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), г.о. ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ КРУТОВСКАЯ,
+                        ЗД. 33</td>
+                     <td>115201, Г.МОСКВА 77, Ш КАШИРСКОЕ, Д. 22, К. 4</td>
+                     <td>7724053916</td>
+                     <td>168443001</td>
+                     <td>субъект малого                                                    предпринимательства
+                        </td>
+                     <td>7-342-2700370<br>a_moiseeva@perm.protek.ru</td>
+                  </tr>
+               </table>
+               <div class="vert-space"></div>
+            </div>
+            <div class="inextricable">
+               <center class="bottom-pad">Раздел IV. Информация об оплате суммы фактически понесенного ущерба,
+                  обусловленного изменением условий контракта                            </center>
+               <table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+                  <tr class="border-table-head">
+                     <td>Дата</td>
+                     <td>Номер документа</td>
+                     <td>Сумма возмещения ущерба (в валюте контракта)</td>
+                  </tr>
+                  <tr>
+                     <td style="text-align:left;">1</td>
+                     <td style="text-align:left;">2</td>
+                     <td style="text-align:left;">3</td>
+                  </tr>
+               </table>
+               <div class="vert-space"></div>
+            </div>
+            <div class="inextricable land">
+               <center class="bottom-pad">Раздел V. Информация о субподрядчиках, соисполнителях из числа СМП, СОНО</center>
+               <table cellpadding="0" cellspacing="0" class="border-table contract-cell-content">
+                  <tr class="border-table-head">
+                     <td>№ п/п</td>
+                     <td>Наименование юридического лица                                        (ф.и.о. индивидуального
+                        предпринимателя)</td>
+                     <td>Адрес места нахождения</td>
+                     <td>Адрес почтовый</td>
+                     <td>ИНН</td>
+                     <td>КПП</td>
+                     <td>ОКОПФ</td>
+                     <td>Статус</td>
+                     <td>Реквизиты договора</td>
+                     <td>Предмет договора</td>
+                     <td>Способ указания цены договора</td>
+                     <td>Цена договора</td>
+                  </tr>
+                  <tr>
+                     <td style="text-align:left;">1</td>
+                     <td style="text-align:left;">2</td>
+                     <td style="text-align:left;">3</td>
+                     <td style="text-align:left;">4</td>
+                     <td style="text-align:left;">5</td>
+                     <td style="text-align:left;">6</td>
+                     <td style="text-align:left;">7</td>
+                     <td style="text-align:left;">8</td>
+                     <td style="text-align:left;">9</td>
+                     <td style="text-align:left;">10</td>
+                     <td style="text-align:left;">11</td>
+                     <td style="text-align:left;">12</td>
+                  </tr>
+               </table>
+            </div><br><div class="inextricable">
+               <center class="bottom-pad">Раздел VI. Платежные реквизиты</center>
+               <table cellpadding="0" cellspacing="0" class="border-table contract-cell-content accountDetails">
+                  <tr class="border-table-head">
+                     <td style="text-align: center;">Наименование организации, ИНН, КПП / ФИО</td>
+                     <td style="text-align: center;">Тип счета</td>
+                     <td style="text-align: center;">Номер лицевого счета/<br>Код поступления</td>
+                     <td style="text-align: center;">Номер банковского (казначейского) счета</td>
+                     <td style="text-align: center;">Реквизиты банка, ТОФК</td>
+                     <td style="text-align: center;">Наименование контрагента для п/п, ОКТМО, КБК</td>
+                  </tr>
+                  <tr>
+                     <td style="text-align: center;">1</td>
+                     <td style="text-align: center;">2</td>
+                     <td style="text-align: center;">3</td>
+                     <td style="text-align: center;">4</td>
+                     <td style="text-align: center;">5</td>
+                     <td style="text-align: center;">6</td>
+                  </tr>
+                  <tr>
+                     <td rowspan="1">Заказчик:                                                <br>ФЕДЕРАЛЬНОЕ КАЗЕННОЕ УЧРЕЖДЕНИЕ ЗДРАВООХРАНЕНИЯ "МЕДИКО-САНИТАРНАЯ ЧАСТЬ № 59 ФЕДЕРАЛЬНОЙ
+                        СЛУЖБЫ ИСПОЛНЕНИЯ НАКАЗАНИЙ"<br>ИНН: 2464033793,<br>КПП: 590501001</td>
+                     <td>Лицевой счет в ФК</td>
+                     <td>03561829630</td>
+                     <td>03211643000000015600</td>
+                     <td>ОТДЕЛЕНИЕ ПЕРМЬ БАНКА РОССИИ // УФК по Пермскому краю, г. Пермь<br>            БИК: 015773997,                к/с: 40102810145370000048</td>
+                     <td></td>
+                  </tr>
+                  <tr>
+                     <td rowspan="1">Поставщик (подрядчик, исполнитель):<br>Филиал АКЦИОНЕРНОГО ОБЩЕСТВА "ЦЕНТР ВНЕДРЕНИЯ "ПРОТЕК" "ПРОТЕК-10"<br>                                                            ИНН: 7724053916, КПП: 168443001</td>
+                     <td>Расчетный счет в банке</td>
+                     <td></td>
+                     <td>40702810062260100963</td>
+                     <td>отделение "Банк Татарстан" №8610 ПАО Сбербанк, г. Казань<br>            БИК: 049205603,                к/с: 30101810600000000603</td>
+                     <td>
+                        <div>Филиал АО  "ЦВ "ПРОТЕК" "ПРОТЕК-10"</div>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td rowspan="1">Контрагент для уплаты неустоек
+                        (штрафов, пеней):                                                                <br>ФЕДЕРАЛЬНОЕ КАЗЕННОЕ УЧРЕЖДЕНИЕ ЗДРАВООХРАНЕНИЯ "МЕДИКО-САНИТАРНАЯ ЧАСТЬ № 59 ФЕДЕРАЛЬНОЙ
+                        СЛУЖБЫ ИСПОЛНЕНИЯ НАКАЗАНИЙ"<br>                                                                ИНН: 2464033793,                                                                КПП:
+                        590501001</td>
+                     <td>Счет для перечисления денежных средств</td>
+                     <td>04561829630</td>
+                     <td>03100643000000015600</td>
+                     <td>ОТДЕЛЕНИЕ ПЕРМЬ БАНКА РОССИИ // УФК по Пермскому краю, г. Пермь<br>            БИК: 015773997,                к/с: 40102810145370000048</td>
+                     <td>
+                        <div>УФК ПО ПЕРМСКОМУ КРАЮ (ФКУЗ МСЧ-59 ФСИН РОССИИ, л/с 04561829630)</div>
+                        <div>ОКТМО: 57701000</div>
+                        <div>КБК: 32011607090019000140</div>
+                     </td>
+                  </tr>
+               </table>
+            </div><br><div class="inextricable">
+               <table cellpadding="5" cellspacing="0" class="contract-cell-content">
+                  <tr>
+                     <td width="33%">Руководитель или иное уполномоченное лицо</td>
+                     <td style="padding-right: 10px" width="23%">
+                        <div class="data" style="height:25px"></div>
+                     </td>
+                     <td>
+                        <div class="data" style="height:25px; text-align: center">Елена Михайловна Сухова</div>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td>
+                        <div class="vert-space"></div>
+                        <div class="center line">от                                                        "            <span class="data">21</span>            "            <span class="data">Января</span>            &nbsp;20            <span class="data">25</span>            г.        </div>
+                     </td>
+                     <td style="text-align: center">(подпись)</td>
+                     <td style="text-align: center">(расшифровка подписи)</td>
+                  </tr>
+               </table>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>

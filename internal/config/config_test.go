@@ -23,6 +23,11 @@ func setEnvVars() map[string]string {
 		"URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB":       "https://example.com/web/agreement",
 		"URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML": "https://example.com/show/html",
 		"URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB":         "https://example.com/customer",
+		"URL_ZAKUPKI_CONTRACT_GET_NUMBERS":               "https://example.com/customer",
+		"URL_ZUKUPKI_CONTRACT_GET_WEB":                   "https://example.com/customer",
+		"URL_ZUKUPKI_CONTRACT_GET_HTML":                  "https://example.com/customer",
+		"URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB":          "https://example.com/customer",
+		"URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB_ADD_INFO": "https://example.com/customer",
 	}
 	for k, v := range envVars {
 		os.Setenv(k, v)
