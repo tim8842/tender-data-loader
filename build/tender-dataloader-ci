@@ -14,6 +14,12 @@ pipeline {
         URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_WEB = "https://zakupki.gov.ru/epz/contractfz223/card/contract-info.html?id="
         URL_ZAKUPKI_AGREEMENT_GET_AGREEGMENT_SHOW_HTML = "https://zakupki.gov.ru/223/contract/public/contract/print-form/show.html?pfid="
         URL_ZAKUPKI_AGREEMENT_GET_CUSTOMER_WEB = "https://zakupki.gov.ru/epz/organization/view223/info.html?agencyId="
+        URL_ZAKUPKI_CONTRACT_GET_NUMBERS="https://zakupki.gov.ru/epz/contract/search/results.html?morphology=on&search-filter=Дате+размещения&%s=on&contractStageList_1=on&contractStageList_2=on&contractStageList_3=on&contractStageList=1%%2C2%%2C3&contractPriceFrom=%.2f&contractPriceTo=%.2f&budgetLevelsIdNameHidden=%%7B%%7D&contractDateFrom=%s&contractDateTo=%s&sortBy=PUBLISH_DATE&pageNumber=%d&sortDirection=true&recordsPerPage=_50&showLotsInfoHidden=false"
+        URL_ZUKUPKI_CONTRACT_GET_WEB="https://zakupki.gov.ru/epz/contract/contractCard/common-info.html?reestrNumber="
+        URL_ZUKUPKI_CONTRACT_GET_HTML="https://zakupki.gov.ru/epz/contract/printForm/view.html?contractReestrNumber="
+        URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB="https://zakupki.gov.ru/epz/organization/view/info.html?organizationCode="
+        URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB_ADD_INFO="https://zakupki.gov.ru/epz/organization/view/info.html?organizationCode=%s&tab=other"
+
     }
 
     tools { go '1.24.4' }
