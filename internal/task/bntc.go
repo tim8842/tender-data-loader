@@ -7,75 +7,76 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tim8842/tender-data-loader/internal/agreement"
 	"github.com/tim8842/tender-data-loader/internal/config"
+	"github.com/tim8842/tender-data-loader/internal/contract"
 	"github.com/tim8842/tender-data-loader/internal/customer"
-	agreementt "github.com/tim8842/tender-data-loader/internal/task/agreement"
+	"github.com/tim8842/tender-data-loader/internal/supplier"
+	contractt "github.com/tim8842/tender-data-loader/internal/task/contract"
 	uagentt "github.com/tim8842/tender-data-loader/internal/task/uagent"
 	variablet "github.com/tim8842/tender-data-loader/internal/task/variable"
 	"github.com/tim8842/tender-data-loader/internal/uagent"
 	"github.com/tim8842/tender-data-loader/internal/variable"
-	"github.com/tim8842/tender-data-loader/pkg"
 	"github.com/tim8842/tender-data-loader/pkg/parser"
 	"go.uber.org/zap"
 )
 
-type BackToNowAgreementTask struct {
+type BackToNowContractTask struct {
 	cfg         *config.Config
-	agreeRepo   agreement.IAgreementRepo
+	contrRepo   contract.IContractRepo
 	varRepo     variable.IVariableRepo
 	custRepo    customer.ICustomerRepo
+	suppRepo    supplier.ISupplierRepo
+	varId       string
 	staticProxy bool
 }
 
-var funcWrapper = pkg.FuncWrapper
-var Now = func() time.Time {
-	return time.Now()
-}
-
-func NewBackToNowAgreementTask(
+func NewBackToNowContractTask(
 	cfg *config.Config,
-	agreeRepo agreement.IAgreementRepo, varRepo variable.IVariableRepo,
+	contrRepo contract.IContractRepo, varRepo variable.IVariableRepo,
 	custRepo customer.ICustomerRepo,
+	suppRepo supplier.ISupplierRepo,
+	varId string,
 	staticProxy bool,
-) *BackToNowAgreementTask {
-	return &BackToNowAgreementTask{
-		cfg: cfg, agreeRepo: agreeRepo, varRepo: varRepo,
-		custRepo: custRepo, staticProxy: staticProxy,
+) *BackToNowContractTask {
+	return &BackToNowContractTask{
+		cfg: cfg, contrRepo: contrRepo, varRepo: varRepo,
+		custRepo: custRepo, suppRepo: suppRepo,
+		varId:       varId,
+		staticProxy: staticProxy,
 	}
 }
 
-func (t *BackToNowAgreementTask) Process(ctx context.Context, logger *zap.Logger) error {
+func (t *BackToNowContractTask) Process(ctx context.Context, logger *zap.Logger) error {
 	var mainErr error = nil
 outer:
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Info("BackToNowAgreementTask: Context cancelled, exiting.")
+			logger.Info("BackToNowContractTask: Context cancelled, exiting.")
 			return ctx.Err()
 		default:
+			// time.Sleep(20 * time.Second)
 			var tmp any
 			var ok bool
 			var err error
 			var tmpByte []byte
 			// Считываем данные для того чтобы хранить стейт в бд
-			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, variablet.NewGetVariableBackToNowById(t.varRepo, "back_to_now_agreement"))
+			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, variablet.NewGetVariableBackToNowContractById(t.varRepo, t.varId))
 			if err != nil {
 				mainErr = err
 				continue outer
 			}
-
-			varData, ok := tmp.(*variable.VariableBackToNow)
+			varData, ok := tmp.(*variable.VariableBackToNowContract)
 			if !ok {
-				logger.Error("Parse error *model.VariableBackToNow")
-				mainErr = errors.New("parse error *model.VariableBackToNow")
+				logger.Error("Parse error *variable.VariableBackToNowContract")
+				mainErr = errors.New("parse error *variable.VariableBackToNowContract")
 				break outer
 			}
 			dbDate := parser.FromTimeToDate(varData.Vars.SignedAt)
 			if parser.DateOnly(Now()) == parser.DateOnly(varData.Vars.SignedAt) {
 				break outer
 			}
-			userAgentResponse := &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"}, Proxy: map[string]any{"url": nil}} // Если часто таймаут на серваке
+			userAgentResponse := &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15"}, Proxy: map[string]any{"url": nil}} // Если часто таймаут на серваке
 			urlProx := t.cfg.UrlGetProxy
 			// Получаем прокси
 			if !t.staticProxy {
@@ -92,13 +93,11 @@ outer:
 					break outer
 				}
 			}
-			urlNumbersPage := t.cfg.UrlZakupkiAgreementGetNumbersFirst +
-				dbDate +
-				t.cfg.UrlZakupkiAgreementGetNumbersSecond +
-				dbDate +
-				t.cfg.UrlZakupkiAgreementGetNumbersThird +
-				fmt.Sprintf("%d", varData.Vars.Page) +
-				t.cfg.UrlZakupkiAgreementGetNumbersForth
+			urlNumbersPage := fmt.Sprintf(
+				t.cfg.UrlZakupkiContractGetNumbers,
+				varData.Vars.Fz, varData.Vars.PriceFrom, varData.Vars.PriceTo,
+				dbDate, dbDate, varData.Vars.Page,
+			)
 			// // Получаем страницу с номерами
 			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlNumbersPage, userAgentResponse))
 			if err != nil {
@@ -113,9 +112,9 @@ outer:
 				break outer
 			}
 			// Парсим страницу с номерами
-			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, agreementt.NewParseData(tmpByte, agreement.ParseAgreementIds))
+			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, contractt.NewParseData(tmpByte, contract.ParseContractIds))
 			if err != nil {
-				logger.Error("ParseAgreementIds error ", zap.Error(err))
+				logger.Error("ParseContractIds error ", zap.Error(err))
 				mainErr = err
 				break outer
 			}
@@ -125,66 +124,70 @@ outer:
 				mainErr = errors.New("parse error []string")
 				break outer
 			}
-			if len(ids) == 0 {
+			nextDate := func() uint8 {
 				varData.Vars.SignedAt = varData.Vars.SignedAt.Add(24 * time.Hour)
 				varData.Vars.Page = 1
 				vData, err := varData.ConvertToVariable()
 				if err != nil {
 					logger.Error("Error ConvertToVariable ", zap.Error(err))
 					mainErr = err
-					break outer
+					return 1
 				}
 				err = t.varRepo.Update(ctx, varData.ID, &vData)
 				if err != nil {
-					logger.Error("Update data SignedAt agreement error ", zap.Error(err))
+					logger.Error("Update data SignedAt сontract error ", zap.Error(err))
 					mainErr = err
+					return 2
+				}
+				return 2
+			}
+			if len(ids) == 0 {
+				if nextDate() == 1 {
+					break outer
+				} else {
 					continue outer
 				}
-				continue outer
 			}
 			// Запускаем подзадачу, которая делает параллельные 50 запросов и парсит данные
-			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewBtnaManyRequests(t.cfg, ids, true))
+			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewSBtncManyReuests(t.cfg, ids, varData.Vars.Fz, true))
 			if err != nil {
-				logger.Error("Error subtasks.NewBtnaManyRequests", zap.Error(err))
-				mainErr = err
+				logger.Error("Error subtasks.NewBtnсManyRequests", zap.Error(err))
 				if strings.Contains(err.Error(), "no correct data, empty") {
-					varData.Vars.SignedAt = varData.Vars.SignedAt.Add(24 * time.Hour)
-					varData.Vars.Page = 1
-					vData, err := varData.ConvertToVariable()
-					if err != nil {
-						logger.Error("Error ConvertToVariable ", zap.Error(err))
-						mainErr = err
+					if nextDate() == 1 {
 						break outer
 					}
-					err = t.varRepo.Update(ctx, varData.ID, &vData)
-					if err != nil {
-						logger.Error("Update data SignedAt agreement error ", zap.Error(err))
-						mainErr = err
-						continue outer
-					}
+					continue outer
 				}
+				mainErr = err
 				continue outer
 			}
-			arrData, ok := tmp.([]*agreement.AgreementParesedData)
+			arrData, ok := tmp.([]*contract.ContractParesedData)
 			if !ok {
-				logger.Error("Error parse []*model.AgreementParesedData")
-				mainErr = errors.New("error parse []*model.AgreementParesedData")
+				logger.Error("Error parse []*model.ContractParesedData")
+				mainErr = errors.New("error parse []*model.ContractParesedData")
 				break outer
 			}
 			var customers []*customer.Customer
-			var agreements []*agreement.Agreement
+			var contracts []*contract.Contract
+			var suppliers []*supplier.Supplier
 			for _, v := range arrData {
-				a, c := agreement.ParseAgreementDataToModels(v)
+				a, c, s := contract.ParseContractParsedDataToModel(v)
 				customers = append(customers, c)
-				agreements = append(agreements, a)
+				contracts = append(contracts, a)
+				suppliers = append(suppliers, s...)
 			}
-			err = t.agreeRepo.BulkMergeMany(ctx, agreements)
+			err = t.contrRepo.BulkMergeMany(ctx, contracts)
 			if err != nil {
 				logger.Error("Error create many ", zap.Error(err))
 				mainErr = err
 				continue outer
 			}
-
+			err = t.suppRepo.BulkMergeMany(ctx, suppliers)
+			if err != nil {
+				logger.Error("Error create many ", zap.Error(err))
+				mainErr = err
+				continue outer
+			}
 			err = t.custRepo.BulkMergeMany(ctx, customers)
 			if err != nil {
 				logger.Error("Error create many ", zap.Error(err))
@@ -206,7 +209,7 @@ outer:
 			}
 			err = t.varRepo.Update(ctx, varData.ID, &vData)
 			if err != nil {
-				logger.Error("Update data Page agreement error ", zap.Error(err))
+				logger.Error("Update data Page сontract error ", zap.Error(err))
 				mainErr = err
 				continue outer
 			}

@@ -8,21 +8,48 @@ import (
 	"go.uber.org/zap"
 )
 
-type GetVariableBackToNowAgreementById struct {
+type GetVariableBackToNowById struct {
 	variableRepo variable.IVariableRepo
 	id           string
 }
 
-func NewGetVariableBackToNowAgreementById(variableRepo variable.IVariableRepo, id string) *GetVariableBackToNowAgreementById {
-	return &GetVariableBackToNowAgreementById{variableRepo: variableRepo, id: id}
+func NewGetVariableBackToNowById(variableRepo variable.IVariableRepo, id string) *GetVariableBackToNowById {
+	return &GetVariableBackToNowById{variableRepo: variableRepo, id: id}
 }
 
-func (t GetVariableBackToNowAgreementById) Process(ctx context.Context, logger *zap.Logger) (any, error) {
+func (t GetVariableBackToNowById) Process(ctx context.Context, logger *zap.Logger) (any, error) {
 	data, ok := t.variableRepo.GetByID(ctx, t.id)
 	if ok != nil {
 		return nil, ok
 	}
-	var model variable.VariableBackToNowAgreement
+	var model variable.VariableBackToNow
+	b, ok := json.Marshal(data)
+	if ok != nil {
+		return nil, ok
+	}
+	ok = json.Unmarshal(b, &model)
+	if ok == nil {
+		return &model, ok
+	} else {
+		return nil, ok
+	}
+}
+
+type GetVariableBackToNowContractById struct {
+	variableRepo variable.IVariableRepo
+	id           string
+}
+
+func NewGetVariableBackToNowContractById(variableRepo variable.IVariableRepo, id string) *GetVariableBackToNowContractById {
+	return &GetVariableBackToNowContractById{variableRepo: variableRepo, id: id}
+}
+
+func (t GetVariableBackToNowContractById) Process(ctx context.Context, logger *zap.Logger) (any, error) {
+	data, ok := t.variableRepo.GetByID(ctx, t.id)
+	if ok != nil {
+		return nil, ok
+	}
+	var model variable.VariableBackToNowContract
 	b, ok := json.Marshal(data)
 	if ok != nil {
 		return nil, ok

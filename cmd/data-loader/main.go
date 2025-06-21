@@ -8,8 +8,10 @@ import (
 
 	"github.com/tim8842/tender-data-loader/internal/agreement"
 	"github.com/tim8842/tender-data-loader/internal/config"
+	"github.com/tim8842/tender-data-loader/internal/contract"
 	"github.com/tim8842/tender-data-loader/internal/customer"
 	"github.com/tim8842/tender-data-loader/internal/fiber"
+	"github.com/tim8842/tender-data-loader/internal/supplier"
 	"github.com/tim8842/tender-data-loader/internal/task"
 	"github.com/tim8842/tender-data-loader/internal/variable"
 	"github.com/tim8842/tender-data-loader/pkg/db/mongo"
@@ -65,8 +67,12 @@ func main() {
 	variableRepo := &variable.VariableRepo{GenericRepository: genVarRepo}
 	genCustomerRepo := repository.NewGenericRepository[*customer.Customer](dbConn.Collection("customers"), lgr)
 	customerRepo := &customer.CustomerRepo{GenericRepository: genCustomerRepo}
+	genSupplierRepo := repository.NewGenericRepository[*supplier.Supplier](dbConn.Collection("suppliers"), lgr)
+	supplierRepo := &supplier.SupplierRepo{GenericRepository: genSupplierRepo}
+	genContractRepo := repository.NewGenericRepository[*contract.Contract](dbConn.Collection("contracts"), lgr)
+	contractRepo := &contract.ContractRepo{GenericRepository: genContractRepo}
 	variable.CreateBaseVariables(ctxTimeout, lgr, variableRepo)
-	go task.StartTasks(mainCtx, lgr, cfg, agreementRepo, variableRepo, customerRepo)
+	go task.StartTasks(mainCtx, lgr, cfg, agreementRepo, variableRepo, customerRepo, supplierRepo, contractRepo)
 	app := fiber.SetupFiberApp(lgr, agreementRepo)
 
 	lgr.Info("Сервер запущен на :" + cfg.Port)
