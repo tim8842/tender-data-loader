@@ -33,7 +33,7 @@ type RetErr struct {
 func mockFuncWrapperFactory(results map[string]RetErr) func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
 	return func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
 		switch fn.(type) {
-		case *variablet.GetVariableBackToNowById:
+		case *variablet.GetVariableBackToNowById, *variablet.GetVariableBackToNowContractById:
 			r := results["GetVariable"]
 			return r.Return, r.Err
 		case *uagentt.GetRequest:

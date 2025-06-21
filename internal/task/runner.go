@@ -23,16 +23,22 @@ func StartTasks(
 	runner := pkg.NewTaskRunner(ctx, logger, 7)
 
 	// Регистрируем задачу
-	runner.RegisterTask("back_to_now_agreement", NewBackToNowAgreementTask(cfg, agreeRepo, varRepo, custRepo, true))
+	// runner.RegisterTask("back_to_now_agreement", NewBackToNowAgreementTask(cfg, agreeRepo, varRepo, custRepo, true))
 	runner.RegisterTask("back_to_now_contract40000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract40000", true))
-	runner.RegisterTask("back_to_now_contract100000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract100000", true))
-	runner.RegisterTask("back_to_now_contract300000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract300000", true))
-	runner.RegisterTask("back_to_now_contract600000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract600000", true))
-	runner.RegisterTask("back_to_now_contract10000000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract10000000", true))
-	runner.RegisterTask("back_to_now_contract999999999999", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract999999999999", true))
+	// runner.RegisterTask("back_to_now_contract100000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract100000", true))
+	// runner.RegisterTask("back_to_now_contract300000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract300000", true))
+	// runner.RegisterTask("back_to_now_contract600000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract600000", true))
+	// runner.RegisterTask("back_to_now_contract10000000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract10000000", true))
+	// runner.RegisterTask("back_to_now_contract999999999999", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract999999999999", true))
 
 	runner.Start()      // Запускаем воркеры
 	defer runner.Stop() // Гарантированно остановим
 
-	runner.Enqueue("back_to_now_agreement")
+	// runner.Enqueue("back_to_now_agreement")
+	runner.Enqueue("back_to_now_contract40000")
+	// runner.Enqueue("back_to_now_contract100000")
+	// runner.Enqueue("back_to_now_contract300000")
+	// runner.Enqueue("back_to_now_contract600000")
+	// runner.Enqueue("back_to_now_contract10000000")
+	// runner.Enqueue("back_to_now_contract999999999999")
 }

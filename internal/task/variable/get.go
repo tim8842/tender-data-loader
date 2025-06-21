@@ -34,3 +34,30 @@ func (t GetVariableBackToNowById) Process(ctx context.Context, logger *zap.Logge
 		return nil, ok
 	}
 }
+
+type GetVariableBackToNowContractById struct {
+	variableRepo variable.IVariableRepo
+	id           string
+}
+
+func NewGetVariableBackToNowContractById(variableRepo variable.IVariableRepo, id string) *GetVariableBackToNowContractById {
+	return &GetVariableBackToNowContractById{variableRepo: variableRepo, id: id}
+}
+
+func (t GetVariableBackToNowContractById) Process(ctx context.Context, logger *zap.Logger) (any, error) {
+	data, ok := t.variableRepo.GetByID(ctx, t.id)
+	if ok != nil {
+		return nil, ok
+	}
+	var model variable.VariableBackToNowContract
+	b, ok := json.Marshal(data)
+	if ok != nil {
+		return nil, ok
+	}
+	ok = json.Unmarshal(b, &model)
+	if ok == nil {
+		return &model, ok
+	} else {
+		return nil, ok
+	}
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -66,7 +67,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 			default:
 				var err error
 				//получаем прокси
-				userAgentResponse := &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.6045.200 Safari/537.36"}, Proxy: map[string]any{"url": nil}}
+				userAgentResponse := &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Linux; Android 14; Pixel 7 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36"}, Proxy: map[string]any{"url": nil}}
 				if !staticProxy {
 					if userAgentResponse, err = getProxy(ctx, logger, urlProx); err != nil {
 						mainErr = err
@@ -86,9 +87,9 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					return
 				}
 				// Парсим эти страницы
-				tmp, err = funcWrapper(ctx, logger, 1, 5*time.Second, contractt.NewParseData(tmpByte, contract.ParseContractFromMain))
+				tmp, err = funcWrapper(ctx, logger, 0, 0, contractt.NewParseData(tmpByte, contract.ParseContractFromMain))
 				if err != nil {
-					if !errors.Is(err, errors.New("error contract have no noticeId")) {
+					if !strings.Contains(err.Error(), "error contract have no noticeId") {
 						mainErr = err
 					}
 					return
@@ -100,6 +101,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				}
 				data.Law = fz
 				// получаем прокси
+				userAgentResponse = &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"}, Proxy: map[string]any{"url": nil}}
 				if !staticProxy {
 					if userAgentResponse, err = getProxy(ctx, logger, urlProx); err != nil {
 						mainErr = err
@@ -125,6 +127,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					return
 				}
 				// получаем прокси
+				userAgentResponse = &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}, Proxy: map[string]any{"url": nil}}
 				if !staticProxy {
 					if userAgentResponse, err = getProxy(ctx, logger, urlProx); err != nil {
 						mainErr = err

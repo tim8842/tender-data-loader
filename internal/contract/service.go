@@ -62,15 +62,16 @@ func ParseContractFromMain(ctx context.Context, logger *zap.Logger, body []byte)
 
 		})
 	}
-	if data.NoticeId == "" {
-		return nil, errors.New("error contract have no noticeId")
-	}
-	// 1. Номер (№ 82902040527250000050000 → 82902040527250000050000)
 	doc.Find("span.cardMainInfo__purchaseLink.distancedText a").Each(func(i int, s *goquery.Selection) {
 		text := strings.TrimSpace(s.Text())
 		text = strings.TrimPrefix(text, "№")
 		data.ID = strings.ReplaceAll(text, " ", "")
 	})
+	if data.NoticeId == "" {
+		logger.Debug("Error contract have no noticeId " + data.ID)
+		return nil, errors.New("error contract have no noticeId")
+	}
+	// 1. Номер (№ 82902040527250000050000 → 82902040527250000050000
 	// 2. Статус
 	doc.Find("span.cardMainInfo__state").Each(func(i int, s *goquery.Selection) {
 		text := strings.TrimSpace(s.Text())
@@ -113,6 +114,7 @@ func ParseContractFromMain(ctx context.Context, logger *zap.Logger, body []byte)
 		})
 	}
 	if data.Customer.ID == "" {
+		logger.Debug("Error no ID from customer")
 		err = errors.New("error no customer id contract")
 	}
 	return data, err
@@ -140,6 +142,7 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic caught during parsing: %v", r)
+			logger.Debug("Panic caught during parsing contract html")
 		}
 	}()
 	reader := bytes.NewReader(body)
@@ -174,9 +177,9 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 							service.OKPD = ClearTextFromTrash(cell.Text())
 						case "Позиции по КТРУ, ОКПД2, информация о ТРУ", "Код по КТРУ, ОКПД2":
 							service.OKPD2 = ClearTextFromTrash(cell.Text())
-						case "Количество (Объем)":
+						case "Количество (Объем)", "Количество":
 							service.Quantity, _ = parser.ParsePriceToFloat(cell.Text())
-						case "Единица измерения":
+						case "Единица измерения", "Единица измерения товара, работы, услуги":
 							service.QuantityType = ClearTextFromTrash(cell.Text())
 						case "Количество (объем) и единица измерения по ОКЕИ", "Количество и единица измерения по ОКЕИ":
 							tmp := strings.SplitN(cell.Text(), " ", 2)
@@ -186,7 +189,7 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 							}
 						case "Цена за единицу (в валюте контракта)":
 							service.UnitPrice, _ = parser.ParsePriceToFloat(strings.TrimSpace(cell.Text()))
-						case "Страна происхождения товара":
+						case "Страна происхождения товара", "Страна происхождения":
 							service.CountryOfOrigin = ClearTextFromTrash(cell.Text())
 						}
 					})
@@ -224,6 +227,7 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 				}
 				if i > needBiggerThan {
 					supplier := &supplier.Supplier{}
+					var kpp string = ""
 					row.Find("td").Each(func(j int, cell *goquery.Selection) {
 						RemoveBr(cell, " ")
 						switch columns[j] {
@@ -241,9 +245,15 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 							}
 						case "Адрес пользователя услугами почтовой связи", "Почтовый адрес":
 							supplier.MailLocation = ClearTextFromTrash(cell.Text())
+						case "КПП, дата постановки на учет":
+							kpp = ClearTextFromTrash(cell.Text())
+							kpp = strings.Split(kpp, ",")[0]
+						case "КПП":
+							kpp = ClearTextFromTrash(cell.Text())
 						case "ИНН":
 							supplier.INN = ClearTextFromTrash(cell.Text())
 							if supplier.INN == "" {
+								logger.Debug("Error no inn customer")
 								err = errors.New("error no inn")
 								return
 							}
@@ -252,21 +262,33 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 						case "Статус":
 							supplier.Status = ClearTextFromTrash(cell.Text())
 						}
+
 					})
-					if supplier.Name != "" {
+					if kpp == "" {
+						logger.Debug("no kpp supplier " + data.ID)
+					}
+					if supplier.INN == "" {
+						logger.Debug("no INN supplier " + data.ID)
+					}
+					supplier.ID = supplier.INN + kpp
+					if supplier.Name != "" && kpp != "" && supplier.INN != "" {
 						data.Suppliers = append(data.Suppliers, supplier)
 					}
 				}
 			})
 		}
+
 	})
 	data.Services = data.Services[1 : len(data.Services)-1]
 	data.Suppliers = data.Suppliers[1:len(data.Suppliers)]
 	tmp, _ := parser.GetFromHtmlByTitle(doc, "td", "Дата начала исполнения контракта")
 	tmpTime, _ := parser.ParseFromDateToTime(tmp)
 	data.ExecutionStart = tmpTime
-
-	return data, nil
+	if len(data.Suppliers) == 0 {
+		logger.Debug("error no supplier " + data.ID)
+		return nil, errors.New("error no supplier")
+	}
+	return data, err
 }
 
 func ParseCustomerFromMain(ctx context.Context, logger *zap.Logger, body []byte, data *ContractParesedData) (any, error) {
@@ -276,7 +298,6 @@ func ParseCustomerFromMain(ctx context.Context, logger *zap.Logger, body []byte,
 		return nil, fmt.Errorf("failed to parse HTML: %w", err)
 	}
 	doc.Find(".registry-entry__body-value").Each(func(i int, s *goquery.Selection) {
-		fmt.Println(s.Text())
 		if i == 0 {
 			data.Customer.Location = strings.TrimSpace(s.Text())
 		}

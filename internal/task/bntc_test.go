@@ -46,7 +46,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "test endData",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {nil, nil},
 				"GetPage":  {"dsadas", nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -63,7 +63,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "Test err get proxy",
 			results: map[string]RetErr{
 				"GetVariable": {variable.VariableBackToNowContract{ID: "1",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, errors.New("")},
 				"GetProxy": {nil, nil},
 				"GetPage":  {"dsadas", nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -97,7 +97,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "test bad Get Proxy",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {nil, errors.New("")},
 				"GetPage":  {"dsadas", nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -114,7 +114,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "test bad Parse Proxy",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {1, nil},
 				"GetPage":  {"dsadas", nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -131,7 +131,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "test bad get Page",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {1, nil}, "ParseIDs": {[]string{"123", "32"}, errors.New("")},
@@ -148,7 +148,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "test bad type parse Page",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {1, nil}, "ParseIDs": {[]string{"123", "32"}, nil},
@@ -165,7 +165,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "err parse ids",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"32", "d32"}, errors.New("")},
@@ -182,7 +182,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "Bad parse type ids",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]int{32, 33}, nil},
@@ -199,7 +199,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "Bad update after ids",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "1",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{}, nil},
@@ -216,7 +216,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "Bad many Requ",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
@@ -233,7 +233,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "Bad type Parse many request ",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
@@ -250,7 +250,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "Bad ContractRepo.BulkMergeMany ",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
@@ -270,7 +270,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "Bad CustomerRepo.BulkMergeMany",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},
@@ -290,7 +290,7 @@ func TestBackToNowContractTask_Process(t *testing.T) {
 			name:        "Bad VarRepo.Update2 ",
 			results: map[string]RetErr{
 				"GetVariable": {&variable.VariableBackToNowContract{ID: "back_to_now_contract",
-					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2},
+					Vars: variable.VarsBackToNowContract{Page: 1, SignedAt: date2, Fz: "fz44", PriceFrom: 0, PriceTo: 10},
 				}, nil},
 				"GetProxy": {&uagent.UserAgentResponse{}, nil},
 				"GetPage":  {[]byte{10, 12}, nil}, "ParseIDs": {[]string{"123", "3123"}, nil},

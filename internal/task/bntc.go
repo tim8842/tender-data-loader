@@ -59,7 +59,7 @@ outer:
 			var err error
 			var tmpByte []byte
 			// Считываем данные для того чтобы хранить стейт в бд
-			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, variablet.NewGetVariableBackToNowById(t.varRepo, t.varId))
+			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, variablet.NewGetVariableBackToNowContractById(t.varRepo, t.varId))
 			if err != nil {
 				mainErr = err
 				continue outer
@@ -149,7 +149,7 @@ outer:
 			// Запускаем подзадачу, которая делает параллельные 50 запросов и парсит данные
 			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewSBtncManyReuests(t.cfg, ids, varData.Vars.Fz, true))
 			if err != nil {
-				logger.Error("Error subtasks.NewBtnaManyRequests", zap.Error(err))
+				logger.Error("Error subtasks.NewBtnсManyRequests", zap.Error(err))
 				mainErr = err
 				if nextDate() == 1 {
 					break outer
@@ -208,6 +208,7 @@ outer:
 				mainErr = err
 				continue outer
 			}
+			time.Sleep(5 * time.Second)
 		}
 	}
 	return mainErr
