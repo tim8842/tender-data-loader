@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/tim8842/tender-data-loader/internal/config"
@@ -54,6 +55,7 @@ outer:
 			logger.Info("BackToNowContractTask: Context cancelled, exiting.")
 			return ctx.Err()
 		default:
+			time.Sleep(20 * time.Second)
 			var tmp any
 			var ok bool
 			var err error
@@ -150,10 +152,13 @@ outer:
 			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewSBtncManyReuests(t.cfg, ids, varData.Vars.Fz, true))
 			if err != nil {
 				logger.Error("Error subtasks.NewBtnсManyRequests", zap.Error(err))
-				mainErr = err
-				if nextDate() == 1 {
-					break outer
+				if strings.Contains(err.Error(), "no correct data, empty") {
+					if nextDate() == 1 {
+						break outer
+					}
+					continue outer
 				}
+				mainErr = err
 				continue outer
 			}
 			arrData, ok := tmp.([]*contract.ContractParesedData)
@@ -208,7 +213,6 @@ outer:
 				mainErr = err
 				continue outer
 			}
-			time.Sleep(5 * time.Second)
 		}
 	}
 	return mainErr

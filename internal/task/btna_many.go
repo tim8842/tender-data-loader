@@ -76,6 +76,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponse))
 				if err != nil {
 					logger.Error("Agreement web get err ", zap.Error(err))
+					mainErr = err
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -87,6 +88,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, _ = funcWrapper(ctx, logger, 1, 5*time.Second, agreementt.NewParseData(tmpByte, agreement.ParseAgreementFromMain))
 				if tmp == nil {
 					logger.Error("Parse error no noticed id")
+					mainErr = err
 					return
 				}
 				data, ok := tmp.(*agreement.AgreementParesedData)
@@ -114,6 +116,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponse))
 					if err != nil {
 						logger.Error("Agreement html show get err ", zap.Error(err))
+						mainErr = err
 						return
 					}
 					tmpByte, ok = tmp.([]byte)
@@ -152,6 +155,7 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWeb, userAgentResponse))
 				if err != nil {
 					logger.Error("Customer get err ", zap.Error(err))
+					mainErr = err
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -173,6 +177,9 @@ func BtnaManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 	close(results)
 	for msg := range results {
 		res = append(res, msg)
+	}
+	if mainErr != nil {
+		return nil, mainErr
 	}
 	if len(res) == 0 {
 		logger.Error("No correct data, empty")

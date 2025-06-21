@@ -79,6 +79,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err := funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponse))
 				if err != nil {
 					logger.Error("Contract web get err ", zap.Error(err))
+					mainErr = err
 					return
 				}
 				tmpByte, ok := tmp.([]byte)
@@ -113,6 +114,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponse))
 				if err != nil {
 					logger.Error("Contract html show get err ", zap.Error(err))
+					mainErr = err
 					return
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -187,6 +189,9 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 	close(results)
 	for msg := range results {
 		res = append(res, msg)
+	}
+	if mainErr != nil {
+		return nil, mainErr
 	}
 	if len(res) == 0 {
 		logger.Error("No correct data, empty")
