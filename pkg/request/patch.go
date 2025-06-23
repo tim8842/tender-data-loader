@@ -52,8 +52,7 @@ func Patch(ctx context.Context, logger *zap.Logger, url string, body []byte, hea
 	if err != nil {
 		return nil, fmt.Errorf("ошибка чтения тела ответа: %w", err)
 	}
-	fmt.Println(string(body))
-	logger.Error("ASDASDASDASDS " + string(data))
+
 	return data, nil
 }
 

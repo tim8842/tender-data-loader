@@ -54,7 +54,7 @@ func (t *BackToNowContractTask) Process(ctx context.Context, logger *zap.Logger)
 	var mainErr error = nil
 outer:
 	for {
-		// time.Sleep(5 * time.Second)
+		time.Sleep(5 * time.Second)
 		select {
 		case <-ctx.Done():
 			logger.Info("BackToNowContractTask: Context cancelled, exiting.")
@@ -108,18 +108,24 @@ outer:
 			if err != nil {
 				logger.Error("Get numbers page error ", zap.Error(err))
 				mainErr = err
-				status := 500
-				if strings.Contains(err.Error(), "429") {
-					status = 429
+				if strings.Contains(err.Error(), "неверный статус ответа: 404") ||
+					strings.Contains(err.Error(), "неверный статус ответа: 5") {
+					continue outer
 				}
-				_, err = funcWrapper(ctx, logger, 3, 1*time.Second, uagentt.NewPatchData(
-					fmt.Sprintf(`http://83.222.25.147/api/v1/users/%d/status/`, userAgentResponse.ID),
-					&StatusPayload{Status: status},
-					5*time.Second,
-				))
-				if err != nil {
-					mainErr = err
-					break outer
+				if !t.staticProxy {
+					status := 500
+					if strings.Contains(err.Error(), "неверный статус ответа: 429") {
+						status = 429
+					}
+					_, err = funcWrapper(ctx, logger, 3, 1*time.Second, uagentt.NewPatchData(
+						fmt.Sprintf(`http://127.0.0.1:8000/api/v1/users/%d/status/`, userAgentResponse.ID),
+						&StatusPayload{Status: status},
+						5*time.Second,
+					))
+					if err != nil {
+						mainErr = err
+						break outer
+					}
 				}
 				continue outer
 			}
