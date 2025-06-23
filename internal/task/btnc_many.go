@@ -70,7 +70,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				status = 429
 			}
 			_, err = funcWrapper(ctx, logger, 3, 1*time.Second, uagentt.NewPatchData(
-				fmt.Sprintf(`http://127.0.0.1:8000/api/v1/users/%d/status/`, userAgentResponse.ID),
+				fmt.Sprintf(cfg.UrlPatchProxyUsers, userAgentResponse.ID),
 				&StatusPayload{Status: status},
 				5*time.Second,
 			))

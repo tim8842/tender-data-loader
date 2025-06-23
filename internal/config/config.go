@@ -27,6 +27,7 @@ type Config struct {
 	UrlZakupkiContractGetHtml                string
 	UrlZakupkiContractGetCustomerWeb         string
 	UrlZakupkiContractGetCustomerWebAddinfo  string
+	UrlPatchProxyUsers                       string
 }
 
 func LoadConfig(fileToEnv string) (*Config, error) {
@@ -55,6 +56,7 @@ func LoadConfig(fileToEnv string) (*Config, error) {
 		UrlZakupkiContractGetHtml:                os.Getenv("URL_ZUKUPKI_CONTRACT_GET_HTML"),
 		UrlZakupkiContractGetCustomerWeb:         os.Getenv("URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB"),
 		UrlZakupkiContractGetCustomerWebAddinfo:  os.Getenv("URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB_ADD_INFO"),
+		UrlPatchProxyUsers:                       os.Getenv("URL_PATCH_PROXY_USERS"),
 	}
 
 	required := map[string]string{
@@ -75,6 +77,7 @@ func LoadConfig(fileToEnv string) (*Config, error) {
 		"URL_ZUKUPKI_CONTRACT_GET_HTML":                  cfg.UrlZakupkiContractGetHtml,
 		"URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB":          cfg.UrlZakupkiContractGetCustomerWeb,
 		"URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB_ADD_INFO": cfg.UrlZakupkiContractGetCustomerWebAddinfo,
+		"URL_PATCH_PROXY_USERS":                          cfg.UrlPatchProxyUsers,
 	}
 
 	for key, val := range required {
