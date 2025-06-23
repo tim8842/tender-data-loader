@@ -46,10 +46,15 @@ func NewBackToNowContractTask(
 	}
 }
 
+type StatusPayload struct {
+	Status int `json:"status"`
+}
+
 func (t *BackToNowContractTask) Process(ctx context.Context, logger *zap.Logger) error {
 	var mainErr error = nil
 outer:
 	for {
+		// time.Sleep(5 * time.Second)
 		select {
 		case <-ctx.Done():
 			logger.Info("BackToNowContractTask: Context cancelled, exiting.")
@@ -103,6 +108,19 @@ outer:
 			if err != nil {
 				logger.Error("Get numbers page error ", zap.Error(err))
 				mainErr = err
+				status := 500
+				if strings.Contains(err.Error(), "429") {
+					status = 429
+				}
+				_, err = funcWrapper(ctx, logger, 3, 1*time.Second, uagentt.NewPatchData(
+					fmt.Sprintf(`http://83.222.25.147/api/v1/users/%d/status/`, userAgentResponse.ID),
+					&StatusPayload{Status: status},
+					5*time.Second,
+				))
+				if err != nil {
+					mainErr = err
+					break outer
+				}
 				continue outer
 			}
 			tmpByte, ok = tmp.([]byte)
@@ -149,7 +167,7 @@ outer:
 				}
 			}
 			// Запускаем подзадачу, которая делает параллельные 50 запросов и парсит данные
-			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewSBtncManyReuests(t.cfg, ids, varData.Vars.Fz, true))
+			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewSBtncManyReuests(t.cfg, ids, varData.Vars.Fz, userAgentResponse))
 			if err != nil {
 				logger.Error("Error subtasks.NewBtnсManyRequests", zap.Error(err))
 				if strings.Contains(err.Error(), "no correct data, empty") {
