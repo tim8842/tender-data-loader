@@ -24,7 +24,7 @@ func StartTasks(
 
 	// Регистрируем задачу
 	// runner.RegisterTask("back_to_now_agreement", NewBackToNowAgreementTask(cfg, agreeRepo, varRepo, custRepo, true))
-	runner.RegisterTask("back_to_now_contract40000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract40000", true))
+	runner.RegisterTask("back_to_now_contract40000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract40000", false))
 	// runner.RegisterTask("back_to_now_contract100000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract100000", true))
 	// runner.RegisterTask("back_to_now_contract300000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract300000", true))
 	// runner.RegisterTask("back_to_now_contract600000", NewBackToNowContractTask(cfg, contract, varRepo, custRepo, suppRepo, "back_to_now_contract600000", true))

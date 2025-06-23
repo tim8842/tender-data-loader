@@ -141,8 +141,12 @@ func ClearTextFromTrash(text string) string {
 func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte, data *ContractParesedData) (res any, err error) {
 	defer func() {
 		if r := recover(); r != nil {
+			var id string
+			if data != nil {
+				id = data.ID
+			}
 			err = fmt.Errorf("panic caught during parsing: %v", r)
-			logger.Debug("Panic caught during parsing contract html")
+			logger.Debug("Panic caught during parsing contract html " + id)
 		}
 	}()
 	reader := bytes.NewReader(body)
@@ -217,7 +221,7 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 						})
 						columns = append(columns, columns1[0:2]...)
 						columns = append(columns, columns2...)
-						columns = append(columns, columns1[4:9]...)
+						columns = append(columns, columns1[4:]...)
 
 					}
 					needBiggerThan = 1
@@ -271,7 +275,7 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 						logger.Debug("no INN supplier " + data.ID)
 					}
 					supplier.ID = supplier.INN + kpp
-					if supplier.Name != "" && kpp != "" && supplier.INN != "" {
+					if supplier.Name != "" && supplier.INN != "" { //&& kpp != ""
 						data.Suppliers = append(data.Suppliers, supplier)
 					}
 				}
@@ -279,6 +283,9 @@ func ParseContractFromHtml(ctx context.Context, logger *zap.Logger, body []byte,
 		}
 
 	})
+	// fmt.Println(data.ID)
+	// fmt.Println(len(data.Services))
+	// fmt.Println(len(data.Suppliers))
 	data.Services = data.Services[1 : len(data.Services)-1]
 	data.Suppliers = data.Suppliers[1:len(data.Suppliers)]
 	tmp, _ := parser.GetFromHtmlByTitle(doc, "td", "Дата начала исполнения контракта")

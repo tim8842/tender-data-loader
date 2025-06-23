@@ -56,7 +56,7 @@ func TestGetPage(t *testing.T) {
 			mockReq := new(inmock.MockRequester)
 
 			mockReq.
-				On("Get", ctx, mock.Anything, tt.url, 5*time.Second, mock.Anything).
+				On("Get", ctx, mock.Anything, tt.url, 8*time.Second, mock.Anything).
 				Return(tt.mockReturn, tt.mockErr).
 				Once()
 

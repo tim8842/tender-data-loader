@@ -17,7 +17,7 @@ func GetPage(ctx context.Context, logger *zap.Logger, url string, userAgentRepon
 	if tmp, ok := userAgentReponse.Proxy["url"].(string); ok {
 		proxyUrl = tmp
 	}
-	return req.Get(ctx, logger, url, 5*time.Second, &request.RequestOptions{
+	return req.Get(ctx, logger, url, 8*time.Second, &request.RequestOptions{
 		UserAgent: userAgent,
 		ProxyUrl:  proxyUrl,
 	})

@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	urlPackage "net/url"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
+	"golang.org/x/net/proxy"
 )
 
 type RequestOptions struct {
@@ -63,12 +66,50 @@ func (d *Requester) Get(ctx context.Context, logger *zap.Logger, url string, tim
 				logger.Error(fmt.Sprintf("Ошибка при парсинге URL прокси: %v", err))
 				return nil, fmt.Errorf("ошибка при парсинге URL прокси: %w", err)
 			}
+			switch proxyURL.Scheme {
+			case "http", "https":
+				transport := &http.Transport{
+					Proxy: http.ProxyURL(proxyURL),
+				}
+				client = &http.Client{
+					Transport: transport,
+				}
+			case "socks5", "socks4":
+				// golang.org/x/net/proxy поддерживает только SOCKS5 напрямую.
+				address := proxyURL.Host
+				if !strings.Contains(address, ":") {
+					address += ":1080"
+				}
 
-			transport := &http.Transport{
-				Proxy: http.ProxyURL(proxyURL), // Используем URL прокси
-			}
-			client = &http.Client{ //Переопределяем Client при наличии прокси
-				Transport: transport,
+				var auth *proxy.Auth
+				if proxyURL.User != nil {
+					password, _ := proxyURL.User.Password()
+					auth = &proxy.Auth{
+						User:     proxyURL.User.Username(),
+						Password: password,
+					}
+				}
+
+				dialer, err := proxy.SOCKS5("tcp", address, auth, proxy.Direct)
+				if err != nil {
+					logger.Error(fmt.Sprintf("Ошибка при установке SOCKS5 прокси: %v", err))
+					return nil, fmt.Errorf("ошибка при установке SOCKS5 прокси: %w", err)
+				}
+
+				// создаём транспорт с кастомным диалером
+				dialContext := func(ctx context.Context, network, addr string) (net.Conn, error) {
+					return dialer.Dial(network, addr)
+				}
+
+				transport := &http.Transport{
+					DialContext: dialContext,
+				}
+
+				client = &http.Client{
+					Transport: transport,
+				}
+			default:
+				logger.Warn(fmt.Sprintf("Неподдерживаемый тип прокси: %s", proxyURL.Scheme))
 			}
 		}
 	}
