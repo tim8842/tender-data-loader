@@ -54,7 +54,7 @@ func (t *BackToNowContractTask) Process(ctx context.Context, logger *zap.Logger)
 	var mainErr error = nil
 outer:
 	for {
-		// time.Sleep(5 * time.Second)
+		time.Sleep(5 * time.Second)
 		select {
 		case <-ctx.Done():
 			logger.Info("BackToNowContractTask: Context cancelled, exiting.")
@@ -173,7 +173,7 @@ outer:
 				}
 			}
 			// Запускаем подзадачу, которая делает параллельные 50 запросов и парсит данные
-			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewSBtncManyReuests(t.cfg, ids, varData.Vars.Fz, userAgentResponse))
+			tmp, err = funcWrapper(ctx, logger, 0, 0*time.Second, NewSBtncManyReuests(t.cfg, ids, varData.Vars.Fz, nil))
 			if err != nil {
 				logger.Error("Error subtasks.NewBtnсManyRequests", zap.Error(err))
 				if strings.Contains(err.Error(), "no correct data, empty") {

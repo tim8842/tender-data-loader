@@ -55,12 +55,10 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 	results := make(chan *contract.ContractParesedData, lenNums)
 	var res []*contract.ContractParesedData
 	var mainErr error
-	proxyWithGet := func(err error) bool {
+	proxyWithGet := func(err error, id int) bool {
 		if userAgentResponse != nil || strings.Contains(err.Error(), "неверный статус ответа: 404") ||
 			strings.Contains(err.Error(), "неверный статус ответа: 5") {
-			if strings.Contains(err.Error(), "неверный статус ответа: 429") ||
-				strings.Contains(err.Error(), "context deadline") ||
-				strings.Contains(err.Error(), "неверный статус ответа: 5") { // Можно удалить чтобы 500 ошибки не ломали прогу
+			if !strings.Contains(err.Error(), "неверный статус ответа: 404") { // Можно удалить чтобы 500 ошибки не ломали прогу
 				mainErr = err
 			}
 			return true
@@ -70,7 +68,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				status = 429
 			}
 			_, err = funcWrapper(ctx, logger, 3, 1*time.Second, uagentt.NewPatchData(
-				fmt.Sprintf(cfg.UrlPatchProxyUsers, userAgentResponse.ID),
+				fmt.Sprintf(cfg.UrlPatchProxyUsers, id),
 				&StatusPayload{Status: status},
 				5*time.Second,
 			))
@@ -110,7 +108,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponseWeb))
 					if err != nil {
 						logger.Error("Contract web get err ", zap.Error(err))
-						if proxyWithGet(err) {
+						if proxyWithGet(err, userAgentResponseWeb.ID) {
 							return
 						}
 					} else {
@@ -150,7 +148,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					urlShowHtml := cfg.UrlZakupkiContractGetHtml + data.ID
 					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponseHtml))
 					if err != nil {
-						if proxyWithGet(err) {
+						if proxyWithGet(err, userAgentResponseHtml.ID) {
 							return
 						}
 					} else {
@@ -182,7 +180,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWeb, userAgentResponseCust))
 					if err != nil {
 						logger.Error("Customer get err ", zap.Error(err))
-						if proxyWithGet(err) {
+						if proxyWithGet(err, userAgentResponseCust.ID) {
 							return
 						}
 					} else {
@@ -214,7 +212,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWebAddInfo, userAgentResponseCustWebAddInfo))
 					if err != nil {
 						logger.Error("Customer get err ", zap.Error(err))
-						if proxyWithGet(err) {
+						if proxyWithGet(err, userAgentResponseCustWebAddInfo.ID) {
 							return
 						}
 					} else {

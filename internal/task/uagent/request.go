@@ -18,11 +18,11 @@ func NewGetRequest(url string) *GetRequest {
 }
 
 func (t GetRequest) Process(ctx context.Context, logger *zap.Logger) (any, error) {
-	data, ok := uagent.GetUserAgent(ctx, t.url, logger, &request.Requester{})
-	if ok != nil {
-		return nil, ok
+	data, err := uagent.GetUserAgent(ctx, t.url, logger, &request.Requester{})
+	if err != nil {
+		return nil, err
 	}
-	return data, ok
+	return data, nil
 }
 
 // Гет запрос с проски и UserAgent
