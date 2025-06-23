@@ -17,18 +17,18 @@ import (
 )
 
 type SBtncManyRequests struct {
-	cfg         *config.Config
-	ids         []string
-	fz          string
-	staticProxy bool
+	cfg               *config.Config
+	ids               []string
+	fz                string
+	userAgentResponse *uagent.UserAgentResponse
 }
 
-func NewSBtncManyReuests(cfg *config.Config, ids []string, fz string, staticProxy bool) *SBtncManyRequests {
-	return &SBtncManyRequests{cfg, ids, fz, staticProxy}
+func NewSBtncManyReuests(cfg *config.Config, ids []string, fz string, userAgentResponse *uagent.UserAgentResponse) *SBtncManyRequests {
+	return &SBtncManyRequests{cfg, ids, fz, userAgentResponse}
 }
 
 func (t SBtncManyRequests) Process(ctx context.Context, logger *zap.Logger) (any, error) {
-	data, ok := BtncManyRequests(ctx, logger, t.cfg, t.ids, t.fz, t.staticProxy)
+	data, ok := BtncManyRequests(ctx, logger, t.cfg, t.ids, t.fz, t.userAgentResponse)
 	if ok != nil {
 		return nil, ok
 	}
@@ -47,7 +47,7 @@ func getProxy(ctx context.Context, logger *zap.Logger, url string) (*uagent.User
 	return userAgentResponse, nil
 }
 
-func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Config, ids []string, fz string, staticProxy bool) (any, error) {
+func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Config, ids []string, fz string, userAgentResponse *uagent.UserAgentResponse) (any, error) {
 	lenNums := len(ids)
 	var wg sync.WaitGroup
 	urlProx := cfg.UrlGetProxy
@@ -67,16 +67,17 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 			default:
 				var err error
 				//получаем прокси
-				userAgentResponse := &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Linux; Android 14; Pixel 7 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36"}, Proxy: map[string]any{"url": nil}}
-				if !staticProxy {
-					if userAgentResponse, err = getProxy(ctx, logger, urlProx); err != nil {
+				// userAgentResponse := &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Linux; Android 14; Pixel 7 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36"}, Proxy: map[string]any{"url": nil}}
+				userAgentResponseWeb := userAgentResponse
+				if userAgentResponse == nil {
+					if userAgentResponseWeb, err = getProxy(ctx, logger, urlProx); err != nil {
 						mainErr = err
 						return
 					}
 				}
 				// получаем web страницы
 				urlWebPage := cfg.UrlZakupkiContractGetWeb + ids[i]
-				tmp, err := funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponse))
+				tmp, err := funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponseWeb))
 				if err != nil {
 					logger.Error("Contract web get err ", zap.Error(err))
 					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
@@ -104,16 +105,17 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				}
 				data.Law = fz
 				// получаем прокси
-				userAgentResponse = &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"}, Proxy: map[string]any{"url": nil}}
-				if !staticProxy {
-					if userAgentResponse, err = getProxy(ctx, logger, urlProx); err != nil {
+				// userAgentResponse = &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"}, Proxy: map[string]any{"url": nil}}
+				userAgentResponseHtml := userAgentResponse
+				if userAgentResponse == nil {
+					if userAgentResponseHtml, err = getProxy(ctx, logger, urlProx); err != nil {
 						mainErr = err
 						return
 					}
 				}
 				// получаем html show
 				urlShowHtml := cfg.UrlZakupkiContractGetHtml + data.ID
-				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponse))
+				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponseHtml))
 				if err != nil {
 					logger.Error("Contract html show get err ", zap.Error(err))
 					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
@@ -133,15 +135,16 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					return
 				}
 				// получаем прокси
-				userAgentResponse = &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}, Proxy: map[string]any{"url": nil}}
-				if !staticProxy {
-					if userAgentResponse, err = getProxy(ctx, logger, urlProx); err != nil {
+				// userAgentResponse = &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}, Proxy: map[string]any{"url": nil}}
+				userAgentResponseCust := userAgentResponse
+				if userAgentResponse == nil {
+					if userAgentResponseCust, err = getProxy(ctx, logger, urlProx); err != nil {
 						mainErr = err
 						return
 					}
 				}
 				urlCustomerWeb := cfg.UrlZakupkiContractGetCustomerWeb + data.Customer.ID
-				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWeb, userAgentResponse))
+				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWeb, userAgentResponseCust))
 				if err != nil {
 					logger.Error("Customer get err ", zap.Error(err))
 					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
@@ -161,15 +164,16 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					return
 				}
 				// получаем прокси
-				if !staticProxy {
-					if userAgentResponse, err = getProxy(ctx, logger, urlProx); err != nil {
+				userAgentResponseCustWebAddInfo := userAgentResponse
+				if userAgentResponse == nil {
+					if userAgentResponseCustWebAddInfo, err = getProxy(ctx, logger, urlProx); err != nil {
 						mainErr = err
 						return
 					}
 				}
 				// Получаем страницу доп инфы про customer
 				urlCustomerWebAddInfo := fmt.Sprintf(cfg.UrlZakupkiContractGetCustomerWebAddinfo, data.Customer.ID)
-				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWebAddInfo, userAgentResponse))
+				tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWebAddInfo, userAgentResponseCustWebAddInfo))
 				if err != nil {
 					logger.Error("Customer get err ", zap.Error(err))
 					if strings.Contains(err.Error(), "Неверный статус ответа: 429") {
@@ -198,6 +202,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 	for msg := range results {
 		res = append(res, msg)
 	}
+
 	if mainErr != nil {
 		return nil, mainErr
 	}

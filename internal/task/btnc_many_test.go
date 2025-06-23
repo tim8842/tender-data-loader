@@ -20,7 +20,7 @@ func TestBtncManyRequests(t *testing.T) {
 	type testCase struct {
 		name         string
 		ids          []string
-		staticProxy  bool
+		staticProxy  *uagent.UserAgentResponse
 		setupMock    func()
 		expectedErr  bool
 		expectedData []*contract.ContractParesedData
@@ -33,7 +33,7 @@ func TestBtncManyRequests(t *testing.T) {
 		{
 			name:        "Success with one ID",
 			ids:         []string{"id1"},
-			staticProxy: false,
+			staticProxy: nil,
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
@@ -69,7 +69,7 @@ func TestBtncManyRequests(t *testing.T) {
 		{
 			name:        "Success with one ID static",
 			ids:         []string{"id1"},
-			staticProxy: true,
+			staticProxy: &uagent.UserAgentResponse{},
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
@@ -99,7 +99,7 @@ func TestBtncManyRequests(t *testing.T) {
 		{
 			name:        "fail get proxy",
 			ids:         []string{"id1"},
-			staticProxy: false,
+			staticProxy: nil,
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
@@ -118,7 +118,7 @@ func TestBtncManyRequests(t *testing.T) {
 		{
 			name:        "fail get parse type from parsed",
 			ids:         []string{"id1"},
-			staticProxy: false,
+			staticProxy: nil,
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
