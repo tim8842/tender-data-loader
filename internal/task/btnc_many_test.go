@@ -20,7 +20,7 @@ func TestBtncManyRequests(t *testing.T) {
 	type testCase struct {
 		name         string
 		ids          []string
-		staticProxy  bool
+		staticProxy  *uagent.UserAgentResponse
 		setupMock    func()
 		expectedErr  bool
 		expectedData []*contract.ContractParesedData
@@ -33,7 +33,7 @@ func TestBtncManyRequests(t *testing.T) {
 		{
 			name:        "Success with one ID",
 			ids:         []string{"id1"},
-			staticProxy: false,
+			staticProxy: nil,
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
@@ -69,7 +69,7 @@ func TestBtncManyRequests(t *testing.T) {
 		{
 			name:        "Success with one ID static",
 			ids:         []string{"id1"},
-			staticProxy: true,
+			staticProxy: &uagent.UserAgentResponse{},
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
@@ -99,14 +99,38 @@ func TestBtncManyRequests(t *testing.T) {
 		{
 			name:        "fail get proxy",
 			ids:         []string{"id1"},
-			staticProxy: false,
+			staticProxy: nil,
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
 					call++
 					switch call {
 					case 1:
+						call--
 						return nil, errors.New("")
+					default:
+						return nil, errors.New("unexpected call")
+					}
+				}
+			},
+			expectedErr:  true,
+			expectedData: []*contract.ContractParesedData{},
+		},
+		{
+			name:        "fail get page refresh proxy",
+			ids:         []string{"id1"},
+			staticProxy: nil,
+			setupMock: func() {
+				call := 0
+				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
+					call++
+					switch call {
+					case 1:
+						return &uagent.UserAgentResponse{}, nil
+					case 2:
+						return []byte("page"), errors.New("context deadline")
+					case 3:
+						return nil, errors.New("cant get new proxy")
 					default:
 						return nil, errors.New("unexpected call")
 					}
@@ -118,7 +142,7 @@ func TestBtncManyRequests(t *testing.T) {
 		{
 			name:        "fail get parse type from parsed",
 			ids:         []string{"id1"},
-			staticProxy: false,
+			staticProxy: nil,
 			setupMock: func() {
 				call := 0
 				funcWrapper = func(ctx context.Context, logger *zap.Logger, maxRetries int, delay time.Duration, fn pkg.FuncInWrapp) (any, error) {
@@ -142,14 +166,15 @@ func TestBtncManyRequests(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancelled := context.WithTimeout(context.Background(), 20*time.Microsecond)
 			defer func() {
 				funcWrapper = originalFuncWrapper
+				cancelled()
 			}()
 
 			tt.setupMock()
 
 			logger := zap.NewNop()
-			ctx := context.Background()
 			cfg := &config.Config{
 				UrlGetProxy:                             "proxy/",
 				UrlZakupkiContractGetWeb:                "web/",

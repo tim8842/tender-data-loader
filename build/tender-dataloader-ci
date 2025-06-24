@@ -19,6 +19,7 @@ pipeline {
         URL_ZUKUPKI_CONTRACT_GET_HTML="https://zakupki.gov.ru/epz/contract/printForm/view.html?contractReestrNumber="
         URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB="https://zakupki.gov.ru/epz/organization/view/info.html?organizationCode="
         URL_ZUKUPKI_CONTRACT_GET_CUSTOMER_WEB_ADD_INFO="https://zakupki.gov.ru/epz/organization/view/info.html?organizationCode=%s&tab=other"
+        URL_PATCH_PROXY_USERS="http://83.222.25.147/api/v1/users/%d/status/"
 
     }
 

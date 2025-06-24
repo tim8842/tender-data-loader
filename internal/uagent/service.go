@@ -29,10 +29,10 @@ func GetUserAgent(ctx context.Context, url string, logger *zap.Logger, requester
 	if err != nil {
 		return nil, err
 	}
-	ok := json.Unmarshal(res, &usStruct)
-	if ok != nil {
+	err = json.Unmarshal(res, &usStruct)
+	if err != nil {
 		logger.Debug("Не может привести тип ответа")
-		return nil, ok
+		return nil, err
 	}
 	return &usStruct, err
 }
