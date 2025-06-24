@@ -54,7 +54,7 @@ func (t *BackToNowContractTask) Process(ctx context.Context, logger *zap.Logger)
 	var mainErr error = nil
 outer:
 	for {
-		time.Sleep(5 * time.Second)
+		// time.Sleep(5 * time.Second)
 		select {
 		case <-ctx.Done():
 			logger.Info("BackToNowContractTask: Context cancelled, exiting.")

@@ -45,6 +45,9 @@ func mockFuncWrapperFactory(results map[string]RetErr) func(ctx context.Context,
 		case *agreementt.ParseData:
 			r := results["ParseIDs"]
 			return r.Return, r.Err
+		case *uagentt.PatchData:
+			r := results["PatchData"]
+			return r.Return, r.Err
 		case *SBtnaManyRequests:
 			r := results["Btna"]
 			return r.Return, r.Err

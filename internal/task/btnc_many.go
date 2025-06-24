@@ -83,7 +83,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 	defer cancel()
 	for i := 0; i < lenNums; i++ {
 		wg.Add(1)
-		go func() {
+		go func(i int) {
 			defer wg.Done()
 			select {
 			case <-ctx.Done():
@@ -94,25 +94,33 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				var tmp any
 				//получаем прокси
 				// userAgentResponse := &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Linux; Android 14; Pixel 7 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.6261.111 Mobile Safari/537.36"}, Proxy: map[string]any{"url": nil}}
+			outer:
 				for {
-					userAgentResponseWeb := userAgentResponse
-					if userAgentResponse == nil {
-						if userAgentResponseWeb, err = getProxy(ctx, logger, urlProx); err != nil {
-							mainErr = err
-							logger.Error(err.Error())
-							continue
+					select {
+					case <-ctx.Done():
+						logger.Warn("context cancelled inside retry loop")
+						mainErr = errors.New("context cancelled inside retry loop")
+						return
+					default:
+						userAgentResponseWeb := userAgentResponse
+						if userAgentResponse == nil {
+							if userAgentResponseWeb, err = getProxy(ctx, logger, urlProx); err != nil {
+								mainErr = err
+								logger.Error(err.Error())
+								continue outer
+							}
 						}
-					}
-					// получаем web страницы
-					urlWebPage := cfg.UrlZakupkiContractGetWeb + ids[i]
-					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponseWeb))
-					if err != nil {
-						logger.Error("Contract web get err ", zap.Error(err))
-						if proxyWithGet(err, userAgentResponseWeb.ID) {
-							return
+						// получаем web страницы
+						urlWebPage := cfg.UrlZakupkiContractGetWeb + ids[i]
+						tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlWebPage, userAgentResponseWeb))
+						if err != nil {
+							logger.Error("Contract web get err ", zap.Error(err))
+							if proxyWithGet(err, userAgentResponseWeb.ID) {
+								return
+							}
+						} else {
+							break outer
 						}
-					} else {
-						break
 					}
 				}
 				tmpByte, ok := tmp.([]byte)
@@ -136,23 +144,32 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				data.Law = fz
 				// получаем прокси
 				// userAgentResponse = &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"}, Proxy: map[string]any{"url": nil}}
+			outer2:
 				for {
-					userAgentResponseHtml := userAgentResponse
-					if userAgentResponse == nil {
-						if userAgentResponseHtml, err = getProxy(ctx, logger, urlProx); err != nil {
-							mainErr = err
-							return
+					select {
+					case <-ctx.Done():
+						logger.Warn("context cancelled inside retry loop")
+						mainErr = errors.New("context cancelled inside retry loop")
+						return
+					default:
+						userAgentResponseHtml := userAgentResponse
+						if userAgentResponse == nil {
+							if userAgentResponseHtml, err = getProxy(ctx, logger, urlProx); err != nil {
+								mainErr = err
+								logger.Error(err.Error())
+								continue outer2
+							}
 						}
-					}
-					// получаем html show
-					urlShowHtml := cfg.UrlZakupkiContractGetHtml + data.ID
-					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponseHtml))
-					if err != nil {
-						if proxyWithGet(err, userAgentResponseHtml.ID) {
-							return
+						// получаем html show
+						urlShowHtml := cfg.UrlZakupkiContractGetHtml + data.ID
+						tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlShowHtml, userAgentResponseHtml))
+						if err != nil {
+							if proxyWithGet(err, userAgentResponseHtml.ID) {
+								return
+							}
+						} else {
+							break outer2
 						}
-					} else {
-						break
 					}
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -168,23 +185,32 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				}
 				// получаем прокси
 				// userAgentResponse = &uagent.UserAgentResponse{UserAgent: map[string]any{"agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}, Proxy: map[string]any{"url": nil}}
+			outer3:
 				for {
-					userAgentResponseCust := userAgentResponse
-					if userAgentResponse == nil {
-						if userAgentResponseCust, err = getProxy(ctx, logger, urlProx); err != nil {
-							mainErr = err
-							return
+					select {
+					case <-ctx.Done():
+						logger.Warn("context cancelled inside retry loop")
+						mainErr = errors.New("context cancelled inside retry loop")
+						return
+					default:
+						userAgentResponseCust := userAgentResponse
+						if userAgentResponse == nil {
+							if userAgentResponseCust, err = getProxy(ctx, logger, urlProx); err != nil {
+								mainErr = err
+								logger.Error(err.Error())
+								continue outer3
+							}
 						}
-					}
-					urlCustomerWeb := cfg.UrlZakupkiContractGetCustomerWeb + data.Customer.ID
-					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWeb, userAgentResponseCust))
-					if err != nil {
-						logger.Error("Customer get err ", zap.Error(err))
-						if proxyWithGet(err, userAgentResponseCust.ID) {
-							return
+						urlCustomerWeb := cfg.UrlZakupkiContractGetCustomerWeb + data.Customer.ID
+						tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWeb, userAgentResponseCust))
+						if err != nil {
+							logger.Error("Customer get err ", zap.Error(err))
+							if proxyWithGet(err, userAgentResponseCust.ID) {
+								return
+							}
+						} else {
+							break outer3
 						}
-					} else {
-						break
 					}
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -199,24 +225,33 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					return
 				}
 				// получаем прокси
+			outer4:
 				for {
-					userAgentResponseCustWebAddInfo := userAgentResponse
-					if userAgentResponse == nil {
-						if userAgentResponseCustWebAddInfo, err = getProxy(ctx, logger, urlProx); err != nil {
-							mainErr = err
-							return
+					select {
+					case <-ctx.Done():
+						logger.Warn("context cancelled inside retry loop")
+						mainErr = errors.New("context cancelled inside retry loop")
+						return
+					default:
+						userAgentResponseCustWebAddInfo := userAgentResponse
+						if userAgentResponse == nil {
+							if userAgentResponseCustWebAddInfo, err = getProxy(ctx, logger, urlProx); err != nil {
+								mainErr = err
+								logger.Error(err.Error())
+								continue outer4
+							}
 						}
-					}
-					// Получаем страницу доп инфы про customer
-					urlCustomerWebAddInfo := fmt.Sprintf(cfg.UrlZakupkiContractGetCustomerWebAddinfo, data.Customer.ID)
-					tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWebAddInfo, userAgentResponseCustWebAddInfo))
-					if err != nil {
-						logger.Error("Customer get err ", zap.Error(err))
-						if proxyWithGet(err, userAgentResponseCustWebAddInfo.ID) {
-							return
+						// Получаем страницу доп инфы про customer
+						urlCustomerWebAddInfo := fmt.Sprintf(cfg.UrlZakupkiContractGetCustomerWebAddinfo, data.Customer.ID)
+						tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, uagentt.NewGetPage(urlCustomerWebAddInfo, userAgentResponseCustWebAddInfo))
+						if err != nil {
+							logger.Error("Customer get err ", zap.Error(err))
+							if proxyWithGet(err, userAgentResponseCustWebAddInfo.ID) {
+								return
+							}
+						} else {
+							break outer4
 						}
-					} else {
-						break
 					}
 				}
 				tmpByte, ok = tmp.([]byte)
@@ -233,7 +268,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 				results <- data
 			}
 
-		}()
+		}(i)
 	}
 	wg.Wait()
 	close(results)
