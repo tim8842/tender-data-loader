@@ -54,7 +54,7 @@ func (t *BackToNowContractTask) Process(ctx context.Context, logger *zap.Logger)
 	var mainErr error = nil
 outer:
 	for {
-		// time.Sleep(5 * time.Second)
+		time.Sleep(5 * time.Second)
 		select {
 		case <-ctx.Done():
 			logger.Info("BackToNowContractTask: Context cancelled, exiting.")
@@ -136,7 +136,7 @@ outer:
 				break outer
 			}
 			// Парсим страницу с номерами
-			tmp, err = funcWrapper(ctx, logger, 3, 5*time.Second, contractt.NewParseData(tmpByte, contract.ParseContractIds))
+			tmp, err = funcWrapper(ctx, logger, 0, 0, contractt.NewParseData(tmpByte, contract.ParseContractIds))
 			if err != nil {
 				logger.Error("ParseContractIds error ", zap.Error(err))
 				mainErr = err

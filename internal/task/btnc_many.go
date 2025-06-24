@@ -178,7 +178,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					return
 				}
 				// Парсим show
-				_, err = funcWrapper(ctx, logger, 1, 5*time.Second, contractt.NewParseDataInContractParesedData(tmpByte, contract.ParseContractFromHtml, data))
+				_, err = funcWrapper(ctx, logger, 0, 0, contractt.NewParseDataInContractParesedData(tmpByte, contract.ParseContractFromHtml, data))
 				if err != nil {
 					mainErr = err
 					return
@@ -219,7 +219,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					return
 				}
 				// Парсим Customer
-				_, err = funcWrapper(ctx, logger, 1, 5*time.Second, contractt.NewParseDataInContractParesedData(tmpByte, contract.ParseCustomerFromMain, data))
+				_, err = funcWrapper(ctx, logger, 0, 0, contractt.NewParseDataInContractParesedData(tmpByte, contract.ParseCustomerFromMain, data))
 				if err != nil {
 					mainErr = err
 					return
@@ -260,7 +260,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 					return
 				}
 				// Парсим Customer
-				_, err = funcWrapper(ctx, logger, 1, 5*time.Second, contractt.NewParseDataInContractParesedData(tmpByte, contract.ParseCustomerFromMainAddInfo, data))
+				_, err = funcWrapper(ctx, logger, 0, 0, contractt.NewParseDataInContractParesedData(tmpByte, contract.ParseCustomerFromMainAddInfo, data))
 				if err != nil {
 					mainErr = err
 					return
