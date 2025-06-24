@@ -58,7 +58,7 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 	proxyWithGet := func(errP error, id int) bool {
 		if userAgentResponse != nil || strings.Contains(errP.Error(), "неверный статус ответа: 404") ||
 			strings.Contains(errP.Error(), "неверный статус ответа: 5") {
-			if !strings.Contains(errP.Error(), "неверный статус ответа: 404") ||
+			if !strings.Contains(errP.Error(), "неверный статус ответа: 404") &&
 				!strings.Contains(errP.Error(), "неверный статус ответа: 500") { // Можно удалить чтобы 500 ошибки не ломали прогу (Но просто старые страницы лежат и не встают спустя 30 минут даже)
 				mainErr = errP
 			}
