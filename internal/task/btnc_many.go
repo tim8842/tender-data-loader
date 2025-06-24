@@ -55,25 +55,26 @@ func BtncManyRequests(ctx context.Context, logger *zap.Logger, cfg *config.Confi
 	results := make(chan *contract.ContractParesedData, lenNums)
 	var res []*contract.ContractParesedData
 	var mainErr error
-	proxyWithGet := func(err error, id int) bool {
-		if userAgentResponse != nil || strings.Contains(err.Error(), "неверный статус ответа: 404") ||
-			strings.Contains(err.Error(), "неверный статус ответа: 5") {
-			if !strings.Contains(err.Error(), "неверный статус ответа: 404") { // Можно удалить чтобы 500 ошибки не ломали прогу
-				mainErr = err
+	proxyWithGet := func(errP error, id int) bool {
+		if userAgentResponse != nil || strings.Contains(errP.Error(), "неверный статус ответа: 404") ||
+			strings.Contains(errP.Error(), "неверный статус ответа: 5") {
+			if !strings.Contains(errP.Error(), "неверный статус ответа: 404") ||
+				!strings.Contains(errP.Error(), "неверный статус ответа: 500") { // Можно удалить чтобы 500 ошибки не ломали прогу (Но просто старые страницы лежат и не встают спустя 30 минут даже)
+				mainErr = errP
 			}
 			return true
 		} else {
 			status := 500
-			if strings.Contains(err.Error(), "неверный статус ответа: 429") {
+			if strings.Contains(errP.Error(), "неверный статус ответа: 429") {
 				status = 429
 			}
-			_, err = funcWrapper(ctx, logger, 3, 1*time.Second, uagentt.NewPatchData(
+			_, errP = funcWrapper(ctx, logger, 3, 1*time.Second, uagentt.NewPatchData(
 				fmt.Sprintf(cfg.UrlPatchProxyUsers, id),
 				&StatusPayload{Status: status},
 				5*time.Second,
 			))
-			if err != nil {
-				mainErr = err
+			if errP != nil {
+				mainErr = errP
 				return true
 			}
 		}
